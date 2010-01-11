@@ -1,0 +1,809 @@
+#include "config.h"
+#include "ProjectsRcp.h"
+
+// Forms ------------------------------------------------------------------------------------------
+
+FORM ID MainForm AT(0 0 160 160)
+NOFRAME
+NOSAVEBEHIND
+USABLE
+MENUID MainFormMenuV35
+BEGIN
+  TITLE "Survey"
+
+  POPUPTRIGGER "1234567890123456" ID MainCategoriesPopTrigger AT(160 0 0 12) USABLE RIGHTANCHOR FONT 0
+  POPUPLIST ID MainCategoriesPopTrigger MainCategoriesList
+  LIST "" ID MainCategoriesList AT(86 0 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+ 	REPEATBUTTON "\x01" ID MainScrollUpRepeating AT(147 144 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
+  REPEATBUTTON "\x02" ID MainScrollDownRepeating AT(147 152 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
+
+	BUTTON "Login" ID MainNewButton AT (1 147 26 12)
+#ifdef CONFIG_ALLTODOS_DLG
+  BUTTON "ToDos" ID MainToDoButton AT (PREVRIGHT+4 PREVTOP 34 12)
+#endif /* CONFIG_ALLTODOS_DLG */
+	BUTTON "Show ..." ID MainShowButton AT (PREVRIGHT+4 PREVTOP 38 12)
+
+#ifdef CONFIG_HANDERA
+	TABLE ID MainProjectTable AT (0 16 160 128) ROWS 24 COLUMNS 6 COLUMNWIDTHS 10 10 10 10 10 10
+#else /* CONFIG_HANDERA */
+	TABLE ID MainProjectTable AT (0 16 160 123) ROWS 11 COLUMNS 6 COLUMNWIDTHS 10 10 10 10 10 10
+#endif /* CONFIG_HANDERA */
+
+	LIST "1" "2" "3" "4" "5" ID MainPriorityList AT(1 10 12 1) VISIBLEITEMS 5 NONUSABLE FONT 1
+	LIST "Active" "Canceled" "Stopped" "Finished" "Testing" MainStateList AT(1 10 40 1) VISIBLEITEMS 5 NONUSABLE
+	LIST "" ID MainRecCategoryList AT(86 0 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+END
+
+
+
+FORM ID ProjectForm AT (0 0 160 160)
+NOFRAME
+NOSAVEBEHIND
+USABLE
+BEGIN
+	TITLE "12345678901234567890123456789012"
+
+  PUSHBUTTON "General" ID ProjectGeneralPushButton AT(1 15 52 10) USABLE LEFTANCHOR FONT 0 GROUP 1
+  PUSHBUTTON "ToDo" ID ProjectToDoPushButton AT(54 PREVTOP 52 10) USABLE LEFTANCHOR FONT 0 GROUP 1
+  PUSHBUTTON "Memo" ID ProjectMemoPushButton AT(107 PREVTOP 52 10) USABLE LEFTANCHOR FONT 0 GROUP 1
+  POPUPTRIGGER "1234567890123456" ID ProjectToDoCategoryPopTrigger AT(160 0 0 12) NONUSABLE RIGHTANCHOR FONT 0
+  POPUPLIST ID ProjectToDoCategoryPopTrigger ProjectToDoCategoryList
+  LIST "" ID ProjectToDoCategoryList AT(86 0 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+  LABEL "Begin:" ID ProjectBeginLabel AT(30 32) NONUSABLE FONT 1
+	REPEATBUTTON "\x02" ID ProjectBeginDownRepeating AT(68 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+  SELECTORTRIGGER "02.02.02" ID ProjectBeginSelTrigger AT(PREVRIGHT+2 PREVTOP 45 12) NONUSABLE RIGHTANCHOR FONT 0
+	REPEATBUTTON "\x03" ID ProjectBeginUpRepeating AT(PREVRIGHT+2 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+	CHECKBOX "" ID ProjectBeginLockCheck AT( PREVRIGHT+8 PREVTOP 12 12 ) NONUSABLE LEFTANCHOR FONT 0 CHECKED GROUP DateWheelCheckGroup
+
+	LABEL "Duration:" ID ProjectDurationLabel AT(13 48) NONUSABLE FONT 1
+	REPEATBUTTON "\x02" ID ProjectDurationDownRepeating AT(68 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+	FIELD ID ProjectDurationField AT(80 PREVTOP 45 12) USABLE EDITABLE RIGHTALIGN FONT 0 SINGLELINE NUMERIC MAXCHARS 6
+	REPEATBUTTON "\x03" ID ProjectDurationUpRepeating AT(PREVRIGHT+2 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+	CHECKBOX "" ID ProjectDurationLockCheck AT( PREVRIGHT+8 PREVTOP 12 12 ) NONUSABLE LEFTANCHOR FONT 0 GROUP DateWheelCheckGroup
+
+  LABEL "End:" ID ProjectEndLabel AT(41 64) NONUSABLE FONT 1
+	REPEATBUTTON "\x02" ID ProjectEndDownRepeating AT(68 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+  SELECTORTRIGGER "02.02.02" ID ProjectEndSelTrigger AT(PREVRIGHT+2 PREVTOP 45 12) NONUSABLE RIGHTANCHOR FONT 0
+	REPEATBUTTON "\x03" ID ProjectEndUpRepeating AT(PREVRIGHT+2 PREVTOP 10 12) NONUSABLE LEFTANCHOR NOFRAME FONT 4
+	CHECKBOX "" ID ProjectEndLockCheck AT( PREVRIGHT+8 PREVTOP 12 12 ) NONUSABLE LEFTANCHOR FONT 0 GROUP DateWheelCheckGroup
+
+  LABEL "Priority:" ID ProjectPriorityLabel AT(17 80) NONUSABLE FONT 1
+	PUSHBUTTON "1" ProjectPriority1PushButton AT(71 PREVTOP+1 12 10) NONUSABLE LEFTANCHOR FONT 0 GROUP 4
+	PUSHBUTTON "2" ProjectPriority2PushButton AT(PREVRIGHT+1 PREVTOP 12 10) NONUSABLE LEFTANCHOR FONT 0 GROUP 4
+	PUSHBUTTON "3" ProjectPriority3PushButton AT(PREVRIGHT+1 PREVTOP 12 10) NONUSABLE LEFTANCHOR FONT 0 GROUP 4
+	PUSHBUTTON "4" ProjectPriority4PushButton AT(PREVRIGHT+1 PREVTOP 12 10) NONUSABLE LEFTANCHOR FONT 0 GROUP 4
+	PUSHBUTTON "5" ProjectPriority5PushButton AT(PREVRIGHT+1 PREVTOP 12 10) NONUSABLE LEFTANCHOR FONT 0 GROUP 4
+
+  LABEL "State:" ID ProjectStateLabel AT(28 96) NONUSABLE FONT 1
+  POPUPTRIGGER "1234567890" ID ProjectStatePopTrigger AT(67 PREVTOP 45 12) NONUSABLE LEFTANCHOR FONT 0
+  POPUPLIST ID ProjectStatePopTrigger ProjectStateList
+  LIST "Active" "Canceled" "Stopped" "Finished" "Testing" ID ProjectStateList AT(67 73 40 44) NONUSABLE VISIBLEITEMS 5 FONT 0
+
+	LABEL "Category:" ID ProjectCategoryLabel AT(11 111) NONUSABLE FONT 1
+	POPUPTRIGGER "1234567890123456" ID ProjectCategoryPopTrigger AT(67 PREVTOP 0 12) NONUSABLE LEFTANCHOR FONT 0
+	POPUPLIST ID ProjectCategoryPopTrigger ProjectCategoryList
+	LIST "" ID ProjectCategoryList AT(67 PREVTOP 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+  LABEL "Private:" ID ProjectPrivateLabel AT(19 127) NONUSABLE FONT 1
+  CHECKBOX "" ID ProjectPrivateCheckbox AT(68 PREVTOP 12 12) NONUSABLE LEFTANCHOR FONT 0 GROUP 0
+
+  FIELD ID ProjectMemoField AT(1 27 151 115) NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED MULTIPLELINES MAXCHARS 4096 AUTOSHIFT HASSCROLLBAR
+  SCROLLBAR ID ProjectMemoScrollBar AT(152 28 7 110) NONUSABLE VALUE 0 MIN 0 MAX 0 PAGESIZE 0
+
+  REPEATBUTTON "\x01" ID ProjectToDoScrollerUpRepeating AT(147 144 13 8) NONUSABLE LEFTANCHOR NOFRAME FONT 5
+  REPEATBUTTON "\x02" ID ProjectToDoScrollerDownRepeating AT(147 152 13 8) NONUSABLE LEFTANCHOR NOFRAME FONT 5
+#ifdef CONFIG_HANDERA
+  TABLE ID ProjectToDoTable AT(0 27 159 117) ROWS 21 COLUMNS 5 COLUMNWIDTHS 15 15 15 15 15
+#else
+  TABLE ID ProjectToDoTable AT(0 27 159 117) ROWS 10 COLUMNS 5 COLUMNWIDTHS 15 15 15 15 15
+#endif /* CONFIG_HANDERA */
+	LIST "1" "2" "3" "4" "5" ID ProjectToDoPriorityList AT(1 10 12 1) VISIBLEITEMS 5 NONUSABLE FONT 1
+	LIST "Today" "Tomorrow" "One week later" "No Date" "Choose date..." ID ProjectToDoDueDateList AT( 1 10 66 1 ) VISIBLEITEMS 5 NONUSABLE FONT 0
+  LIST "" ID ProjectToDoTableCategoryList AT(86 0 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+  BUTTON "Done" ID ProjectDoneButton AT(1 147 28 AUTO) USABLE LEFTANCHOR FONT 0
+	BUTTON "Create" ID ProjectCreateDBButton AT(PREVRIGHT+4 PREVTOP 38 AUTO ) NONUSABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "Rename..." ID ProjectRenameProjectButton AT(PREVLEFT PREVTOP 46 AUTO) NONUSABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "Delete..." ID ProjectDeleteProjectButton AT(PREVRIGHT+4 PREVTOP 40 AUTO) NONUSABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "New" ID ProjectNewToDoButton AT (33 PREVTOP 24 AUTO) NONUSABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "Details..." ID ProjectDetailsToDoButton AT (PREVRIGHT+4 PREVTOP 42 AUTO) NONUSABLE LEFTANCHOR FRAME FONT 0
+
+	BUTTON "\x05" ID ProjectMoveToDoUpButton AT(PREVRIGHT+4 PREVTOP-1 12 14) NONUSABLE LEFTANCHOR NOFRAME FONT 3
+	BUTTON "\x06" ID ProjectMoveToDoDownButton AT(PREVRIGHT PREVTOP 12 14) NONUSABLE LEFTANCHOR NOFRAME FONT 3
+
+  GRAFFITISTATEINDICATOR AT(135 148)
+END
+
+
+
+FORM ID PreferencesDialog AT(2 2 156 156)
+FRAME
+SAVEBEHIND
+USABLE
+MODAL
+DEFAULTBTNID PreferencesCancelButton
+BEGIN
+	TITLE "Projects Preferences"
+
+	LABEL "Sort by:" AUTOID AT(8 16) USABLE FONT 1
+	POPUPTRIGGER "Category, State, Priority" ID PreferencesSortPopTrigger AT(14 PREVBOTTOM+1 AUTO AUTO) LEFTANCHOR USABLE FONT 0
+	LIST "Priority, State, Name" "State, Priority, Name" "Begin Date, Name" "Name" "Manual" "Category, Priority, State" "Category, State, Priority" "Category, Name" PreferencesSortList AT(PREVLEFT+13 PREVTOP-11 PREVWIDTH-13 88) NONUSABLE VISIBLEITEMS 8 FONT 0
+	POPUPLIST ID PreferencesSortPopTrigger PreferencesSortList
+
+	LABEL "Show ..." AUTOID AT(8 42) USABLE FONT 1
+	CHECKBOX "... Priorities" ID PreferencesPriorityCheckbox AT(14 PREVBOTTOM+1 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "... Begin Dates" ID PreferencesBeginDateCheckbox AT(PREVLEFT PREVBOTTOM+1 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "... To Do Information" ID PreferencesToDoStateCheckbox AT( PREVLEFT PREVBOTTOM+1 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "... Project States" ID PreferencesStateCheckbox AT(PREVLEFT PREVBOTTOM+1 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "... Categories" ID PreferencesPrjtCategoriesCheckbox AT(PREVLEFT PREVBOTTOM+1 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "... Only Active Projects" ID PreferencesOnlyActiveCheckbox AT(PREVLEFT PREVBOTTOM+3 AUTO AUTO) USABLE FONT 1
+
+	BUTTON "OK" PreferencesOKButton AT (6 BOTTOM@151 38 AUTO) USABLE FRAME FONT 0
+	BUTTON "Cancel" PreferencesCancelButton AT (PREVRIGHT+6 PREVTOP 38 AUTO) USABLE FRAME FONT 0
+END
+
+
+FORM ID ToDoPrefsDialog AT (2 2 156 156 )
+FRAME
+SAVEBEHIND
+USABLE
+MODAL
+DEFAULTBTNID ToDoPrefsCancelButton
+BEGIN
+	TITLE "Projects Preferences"
+
+	LABEL "Projects' ToDos ..." ID ToDoPrefsProjectsToDosLabel AT(6 20) NONUSABLE FONT 1
+	LABEL "Sort by:" ID ToDoPrefsSortLabel AT(6 20) USABLE FONT 1
+	POPUPTRIGGER "Priority, Due Date" ID ToDoPrefsSortPopTrigger AT(PREVRIGHT+4 PREVTOP AUTO AUTO) LEFTANCHOR USABLE FONT 0
+	POPUPLIST ID ToDoPrefsSortPopTrigger ToDoPrefsSortList
+	LIST "Priority, Due Date" "Due Date, Priority" "Manual" "Category, Priority" "Category, Due Date" ID ToDoPrefsSortList AT(PREVLEFT PREVTOP 90 55) NONUSABLE VISIBLEITEMS 5 FONT 0
+
+	CHECKBOX "Show Completed Items" ID ToDoPrefsCompletedItemsCheckbox AT(6 41 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "Show Only Due Items" ID ToDoPrefsOnlyDueItemsCheckbox AT(PREVLEFT PREVBOTTOM+2 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "Record Completion Date" ID ToDoPrefsRecCompletionDateCheckbox AT(PREVLEFT PREVBOTTOM+2 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "Show Due Dates" ID ToDoPrefsShowDueDateCheckbox AT(PREVLEFT PREVBOTTOM+9 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "Show Priorities" ID ToDoPrefsShowPrioritiesCheckbox AT(PREVLEFT PREVBOTTOM+3 AUTO AUTO) USABLE FONT 1
+	CHECKBOX "Show Categories" ID ToDoPrefsShowCategoriesCheckbox AT(PREVLEFT PREVBOTTOM+3 AUTO AUTO) USABLE FONT 1
+
+	BUTTON "OK" ID ToDoPrefsOKButton AT(6 BOTTOM@151 38 AUTO) USABLE FRAME FONT 0
+	BUTTON "Cancel" ID ToDoPrefsCancelButton AT(PREVRIGHT+6 PREVTOP 38 AUTO) USABLE FRAME FONT 0
+END
+
+
+
+FORM ID ProjectNameForm AT (2 98 156 60)
+FRAME
+MODAL
+SAVEBEHIND
+USABLE
+#ifdef CONFIG_HLP_STRS
+	HELPID ProjectNameHelpString
+#endif
+DEFAULTBTNID ProjectNameFormCancelButton
+MENUID EditMenu
+BEGIN
+	TITLE "New Project"
+
+	LABEL "Choose your name:" AUTOID AT (4 16) USABLE FONT 1
+	POPUPTRIGGER "Cooper,Sheldon" ID LoginNamePopTrigger AT(14 PREVBOTTOM+1 AUTO AUTO) LEFTANCHOR USABLE FONT 0
+	LIST "Jones,Smantha" "Bradshaw,Carrie" "York,Chorlotte" "Hobbes,Miranda" "Hofstadter,Leonard" "Cooper,Sheldon" "Wolowitz,Howard" "Koothrappali,Rajesh" PreferencesSortList AT(PREVLEFT+13 PREVTOP-11 PREVWIDTH-13 88) NONUSABLE VISIBLEITEMS 8 FONT 0
+	POPUPLIST ID LoginNamePopTrigger LoginNameList
+	/* FIELD ID ProjectNameFormNameField AT (PREVLEFT 28 145 12) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE MAXCHARS 27 AUTOSHIFT */
+	BUTTON "OK" ID ProjectNameFormOKButton AT (PREVLEFT BOTTOM@57 38 AUTO) USABLE FRAME FONT 0
+	BUTTON "Cancel" ID ProjectNameFormCancelButton AT (PREVRIGHT+6 PREVTOP 38 AUTO) USABLE FRAME FONT 0
+	GRAFFITISTATEINDICATOR AT (143 BOTTOM@57)
+END
+
+
+
+FORM ID ToDoNoteForm AT(0 0 160 160)
+NOFRAME
+NOSAVEBEHIND
+USABLE
+MENUID NoteFormMenu
+DEFAULTBTNID ToDoNoteDoneButton
+BEGIN
+	TITLE "mmmmmmmmmmmmmmmmmm"
+	FIELD ID ToDoNoteField AT(0 15 153 125) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED MULTIPLELINES MAXCHARS 4096 AUTOSHIFT HASSCROLLBAR
+  SCROLLBAR ID ToDoNoteScrollBar AT(153 17 7 121) USABLE VALUE 0 MIN 0 MAX 1 PAGESIZE 0
+
+  BUTTON "Done" ID ToDoNoteDoneButton AT(1 147 30 AUTO) USABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "Delete..." ID ToDoNoteDeleteButton AT(PREVRIGHT+6 PREVTOP 40 AUTO) USABLE LEFTANCHOR FRAME FONT 0
+  GRAFFITISTATEINDICATOR AT(138 146)
+END
+
+
+
+FORM ID MemoLookupDialog AT(0 0 160 160)
+NOFRAME
+#ifdef CONFIG_HANDERA
+	NOSAVEBEHIND
+#else
+	SAVEBEHIND
+#endif /* CONFIG_HANDERA */
+USABLE
+DEFAULTBTNID MemoLookupCancelButton
+BEGIN
+#ifdef CONFIG_HANDERA
+  TABLE ID MemoLookupTable AT(0 16 152 130) ROWS 16 COLUMNS 1 COLUMNWIDTHS 152
+#else
+  TABLE ID MemoLookupTable AT(0 18 152 127) ROWS 11 COLUMNS 1 COLUMNWIDTHS 152
+#endif /* CONFIG_HANDERA */
+	SCROLLBAR ID MemoLookupScrollBar AT(153 16 7 125) USABLE VALUE 0 MIN 0 MAX 0
+
+	BUTTON "Add" ID MemoLookupAddButton AT(1 147 26 12) USABLE
+	BUTTON "Cancel" ID MemoLookupCancelButton AT(PREVRIGHT+6 PREVTOP 36 AUTO) USABLE
+END
+
+
+
+FORM ID ToDoDetailsForm AT(2 73 156 85)
+FRAME
+MODAL
+USABLE
+#ifdef CONFIG_HLP_STRS
+	HELPID DetailsHelpString
+#endif
+DEFAULTBTNID DetailsCancelButton
+SAVEBEHIND
+BEGIN
+	TITLE "To Do Item Details"
+
+	LABEL "Priority:" AUTOID AT(10 18) USABLE FONT 1
+	PUSHBUTTON "1" ID DetailsPriority1PushButton AT (58 PREVTOP 11 11) USABLE LEFTANCHOR FONT 0 GROUP 5
+	PUSHBUTTON "2" ID DetailsPriority2PushButton AT (PREVRIGHT+1 PREVTOP 11 11) USABLE LEFTANCHOR FONT 0 GROUP 5
+	PUSHBUTTON "3" ID DetailsPriority3PushButton AT (PREVRIGHT+1 PREVTOP 11 11) USABLE LEFTANCHOR FONT 0 GROUP 5
+	PUSHBUTTON "4" ID DetailsPriority4PushButton AT (PREVRIGHT+1 PREVTOP 11 11) USABLE LEFTANCHOR FONT 0 GROUP 5
+	PUSHBUTTON "5" ID DetailsPriority5PushButton AT (PREVRIGHT+1 PREVTOP 11 11) USABLE LEFTANCHOR FONT 0 GROUP 5
+
+	LABEL "Category:" AUTOID AT(4 33) USABLE FONT 1
+	POPUPTRIGGER "1234567890123456" ID DetailsCategoryPopTrigger AT (57 32 49 13) USABLE LEFTANCHOR FONT 0
+	POPUPLIST DetailsCategoryPopTrigger DetailsCategoryList
+	LIST "" ID DetailsCategoryList AT(59 33 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+	LABEL "Due Date:" AUTOID AT(5 48) USABLE FONT 1
+	POPUPTRIGGER "1234567890123456789" ID DetailsDueDatePopTrigger AT(57 47 75 13) USABLE LEFTANCHOR FONT 0
+	POPUPLIST DetailsDueDatePopTrigger DetailsDueDateList
+	LIST "Today" "Tomorrow" "One week later" "No Date" "Choose Date..." ID DetailsDueDateList AT(59 47 65 55) NONUSABLE VISIBLEITEMS 5 FONT 0
+
+	BUTTON "OK" ID DetailsOKButton AT(4 BOTTOM@81 26 12) USABLE LEFTANCHOR FONT 0
+	BUTTON "Cnl." ID DetailsCancelButton AT(PREVRIGHT+4 PREVTOP 26 12) USABLE LEFTANCHOR FONT 0
+	BUTTON "Del." ID DetailsDeleteButton AT(PREVRIGHT+4 PREVTOP 26 12) USABLE LEFTANCHOR FONT 0
+	BUTTON "Exp." ID DetailsExportButton AT( PREVRIGHT+4 PREVTOP 26 12) USABLE LEFTANCHOR FONT 0
+	BUTTON "Note" ID DetailsNoteButton AT(PREVRIGHT+4 PREVTOP 28 12) USABLE LEFTANCHOR FONT 0
+
+	LIST "" ID DetailsExportList AT(0 0 100 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+END
+
+
+
+#ifdef CONFIG_EXT_ABOUT
+
+	FORM ID ExtAboutDialog AT(2 2 156 156)
+	FRAME
+	MODAL
+	USABLE
+	SAVEBEHIND
+	BEGIN
+		TITLE "About Projects"
+
+		SCROLLBAR ID ExtAboutScrollBar AT (147 18 7 116) VALUE 0 MIN 0 MAX 0 PAGESIZE 100
+		BUTTON "Done" ID ExtAboutDoneButton AT (6 BOTTOM@151 AUTO AUTO)
+	END
+
+#else /* CONFIG_EXT_ABOUT */
+
+	FORM ID AboutDialog AT(2 2 156 156)
+	FRAME
+	MODAL
+	USABLE
+	SAVEBEHIND
+	BEGIN
+		TITLE "About Survey"
+
+		FORMBITMAP 62 20 BITMAP AppIconBitmap USABLE
+		LABEL "Survey v##VERSION##"	AUTOID AT (CENTER@78 46) USABLE FONT 1
+		LABEL "Haohua Huang" AUTOID AT (CENTER@78 PREVBOTTOM+3) USABLE FONT 0
+		LABEL "huang615@umn.edu" AUTOID AT(CENTER@78 PREVBOTTOM+1) USABLE FONT 0
+		LABEL "huang615@umn.edu" AUTOID AT (CENTER@78 PREVBOTTOM+6) USABLE FONT 0
+
+		LABEL "This application is released" AUTOID AT (CENTER@78 PREVBOTTOM+5) USABLE FONT 0
+		LABEL "under the terms of GPL." AUTOID AT (CENTER@78 PREVBOTTOM+1) USABLE FONT 0
+		BUTTON "OK" AUTOID AT(CENTER@78 BOTTOM@150 36 12) USABLE FONT 0
+	END
+
+#endif /* CONFIG_EXT_ABOUT */
+
+
+#ifdef CONFIG_DEF_CATEGORY
+	FORM ID DefaultCategoriesForm AT(2 2 156 156)
+	FRAME
+	MODAL
+	#ifdef CONFIG_HLP_STRS
+		HELPID DefaultCategoriesHelpString
+	#endif
+	SAVEBEHIND
+	USABLE
+	BEGIN
+		TITLE "Edit Default Categories ..."
+	
+		LIST "" ID DefaultCategoriesList AT(5 20 146 110) USABLE VISIBLEITEMS 10 FONT 0
+	
+		BUTTON "OK" ID DefaultCategoriesOKButton AT(5 BOTTOM@152 23 12)
+		BUTTON "New" ID DefaultCategoriesNewButton AT(PREVRIGHT+5 PREVTOP 26 12)
+		BUTTON "Rename" ID DefaultCategoriesRenameButton AT(PREVRIGHT+5 PREVTOP 42 12)
+		BUTTON "Delete" ID DefaultCategoriesDeleteButton AT(PREVRIGHT+5 PREVTOP 40 12)
+	END
+	
+	
+	
+	FORM ID EditDefaultCategoryForm AT(2 98 156 60)
+	FRAME
+	MODAL
+	SAVEBEHIND
+	USABLE
+	BEGIN
+		TITLE "Edit Default Categories"
+	
+		LABEL "Enter a new category name:" AUTOID AT (4 16) USABLE FONT 1
+	
+		FIELD ID EditDefaultCategoryField AT (4 28 145 12) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE MAXCHARS 15 AUTOSHIFT
+		BUTTON "OK" ID EditDefaultCategoryOKButton AT (PREVLEFT BOTTOM@57 38 AUTO) USABLE FRAME FONT 0
+		BUTTON "Cancel" ID EditDefaultCategoryCancelButton AT (PREVRIGHT+6 PREVTOP 38 AUTO) USABLE FRAME FONT 0
+		GRAFFITISTATEINDICATOR AT (143 BOTTOM@57)
+	END
+#endif /* CONFIG_DEF_CATEGORY */
+
+
+
+#ifdef CONFIG_ALLTODOS_DLG
+FORM ID AllToDosDialog AT(0 0 160 160)
+NOFRAME
+NOSAVEBEHIND
+USABLE
+MENUID AllToDosMenu
+BEGIN
+#if 0
+	TITLE "Projects' ToDos"
+	#ifdef CONFIG_HANDERA
+		TABLE ID AllToDosTable AT (0 16 160 123) ROWS 23 COLUMNS 1 COLUMNWIDTHS 160
+	#else
+		TABLE ID AllToDosTable AT (0 16 160 123) ROWS 11 COLUMNS 1 COLUMNWIDTHS 160
+	#endif /* CONFIG_HANDERA */
+#else
+	#ifdef CONFIG_HANDERA
+		TABLE ID AllToDosTable AT (0 0 160 144) ROWS 25 COLUMNS 1 COLUMNWIDTHS 160
+	#else
+		TABLE ID AllToDosTable AT (0 0 160 144) ROWS 13 COLUMNS 1 COLUMNWIDTHS 160
+	#endif /* CONFIG_HANDERA */
+#endif
+
+  LIST "" ID AllToDosCategoryList AT(86 0 72 0) NONUSABLE VISIBLEITEMS 0 FONT 0
+
+	BUTTON "Done" ID AllToDosDoneButton AT (1 147 30 12) USABLE LEFTANCHOR FRAME FONT 0
+	BUTTON "Show ..." ID AllToDosShowButton AT (PREVRIGHT+4 PREVTOP 38 12) USABLE LEFTANCHOR FRAME FONT 0
+
+	BUTTON "\x02" ID AllToDosScrollPrevProjectButton AT(125 147 8 12) USABLE LEFTANCHOR NOFRAME FONT 4
+	BUTTON "\x03" ID AllToDosScrollNextProjectButton AT(PREVRIGHT+1 PREVTOP PREVWIDTH PREVHEIGHT) USABLE LEFTANCHOR NOFRAME FONT 4
+
+ 	REPEATBUTTON "\x01" ID AllToDosScrollUpRepeating AT(147 144 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
+  REPEATBUTTON "\x02" ID AllToDosScrollDownRepeating AT(147 152 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
+END
+#endif /* CONFIG_ALLTODOS_DLG */
+
+
+
+// Menus ------------------------------------------------------------------------------------------
+
+MENU ID NoteFormMenu
+BEGIN
+	PULLDOWN "Edit"
+	BEGIN
+		MENUITEM "Undo" ID EditUndo "U"
+		MENUITEM "Cut" ID EditCut "X"
+		MENUITEM "Copy" ID EditCopy "C"
+		MENUITEM "Paste" ID EditPaste "P"
+		MENUITEM "Select All" ID EditSelectAll "S"
+		MENUITEM SEPARATOR
+		MENUITEM "Keyboard" ID EditKeyboard "K"
+		MENUITEM "Graffiti Help" ID EditGraffiti "G"
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "Phone Lookup" ID OptionsPhoneLookup "L"
+	END
+END
+
+
+
+#ifdef CONFIG_OS_BELOW_35
+
+MENU ID MainFormMenu
+BEGIN
+	PULLDOWN "DBs"
+	BEGIN
+		#ifdef CONFIG_DEF_CATEGORY
+			MENUITEM "Def.Categories..." ID OptionsDefCategories
+		#endif /* CONFIG_DEF_CATEGORY */
+		MENUITEM "Scan for DBs" ID OptionsScanForDBs
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+#endif /* CONFIG_OS_BELOW_35 */
+
+
+
+MENU ID MainFormMenuV35
+BEGIN
+	PULLDOWN "DBs"
+	BEGIN
+		#ifdef CONFIG_DEF_CATEGORY
+			MENUITEM "Def.Categories..." ID OptionsDefCategories
+		#endif /* CONFIG_DEF_CATEGORY */
+		MENUITEM "Scan for DBs" ID OptionsScanForDBs
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "Security..." ID OptionsSecurity "H"
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+
+
+MENU ID ProjectFormToDoMenu
+BEGIN
+	PULLDOWN "Record"
+	BEGIN
+		MENUITEM "Delete Item..." ID DeleteToDoItem "D"
+		MENUITEM "Attach Note" ID AttachToDoNote "A"
+		MENUITEM "Delete Note..." ID DeleteToDoNote "O"
+		MENUITEM "Purge..." ID PurgeToDoList "E"
+		MENUITEM "Rescan ToDos" ID RescanToDoDatabase
+	END
+	PULLDOWN "Edit"
+	BEGIN
+		MENUITEM "Undo" ID EditUndo "U"
+		MENUITEM "Cut" ID EditCut "X"
+		MENUITEM "Copy" ID EditCopy "C"
+		MENUITEM "Paste" ID EditPaste "P"
+		MENUITEM "Select All" ID EditSelectAll "S"
+		MENUITEM SEPARATOR
+		MENUITEM "Keyboard" ID EditKeyboard "K"
+		MENUITEM "Graffiti Help" ID EditGraffiti "G"
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "Preferences..." ID OptionsPreferences "R"
+		MENUITEM "Phone Lookup" ID OptionsPhoneLookup "L"
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+
+
+MENU ID ProjectFormMemoMenu
+BEGIN
+	PULLDOWN "Record"
+	BEGIN
+		MENUITEM "Delete Memo..." ID DeleteMemo "D"
+		MENUITEM "Import Memo..." ID ImportMemo "I"
+		MENUITEM "Export Memo" ID ExportMemo "E"
+	END
+	PULLDOWN "Edit"
+	BEGIN
+		MENUITEM "Undo" ID EditUndo "U"
+		MENUITEM "Cut" ID EditCut "X"
+		MENUITEM "Copy" ID EditCopy "C"
+		MENUITEM "Paste" ID EditPaste "P"
+		MENUITEM "Select All" ID EditSelectAll "S"
+		MENUITEM SEPARATOR
+		MENUITEM "Keyboard" ID EditKeyboard "K"
+		MENUITEM "Graffiti Help" ID EditGraffiti "G"
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "Phone Lookup" ID OptionsPhoneLookup "L"
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+
+
+MENU ID EditMenu
+BEGIN
+	PULLDOWN "Edit"
+	BEGIN
+		MENUITEM "Undo" ID EditUndo "U"
+		MENUITEM "Cut" ID EditCut	"X"
+		MENUITEM "Copy" ID EditCopy "C"
+		MENUITEM "Paste" ID EditPaste "P"
+		MENUITEM "Select All" ID EditSelectAll "S"
+		MENUITEM SEPARATOR
+		MENUITEM "Keyboard" ID EditKeyboard "K"
+		MENUITEM "Graffiti Help" ID EditGraffiti "G"
+	END
+END
+
+
+
+MENU ID GeneralPageMenu
+BEGIN
+	PULLDOWN "Project"
+	BEGIN
+		MENUITEM "Duplicate" ID DuplicateProject
+		MENUITEM "Clear End Date" ID ClearEndDate
+	END
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+
+MENU ID AllToDosMenu
+BEGIN
+	PULLDOWN "Options"
+	BEGIN
+		MENUITEM "Font..." ID OptionsFont "F"
+		MENUITEM "About" ID OptionsAbout
+	END
+END
+
+
+// Alerts -----------------------------------------------------------------------------------------
+
+ALERT ID RomIncompatibleAlert
+ERROR
+BEGIN
+  TITLE "System Incompatible"
+
+#ifdef CONFIG_OS_BELOW_35
+  MESSAGE "System version 3.1 or greater is required to run this application."
+#else
+  MESSAGE "System version 3.5 or greater is required to run this release of the application."
+#endif /* CONFIG_OS_BELOW_35 */
+
+  BUTTONS "OK"
+END
+
+
+
+ALERT ID GeneralWarningAlert
+WARNING
+BEGIN
+	TITLE "Error"
+	MESSAGE "^1"
+	BUTTONS "OK"
+END
+
+
+
+ALERT ID DeleteProjectAlert
+CONFIRMATION
+DEFAULTBUTTON DeleteProjectNoButton
+BEGIN
+	TITLE "Delete Project"
+	MESSAGE "Do you really want to delete the current project?"
+	BUTTONS "Yes" "No"
+END
+
+
+
+ALERT ID DeleteToDoAlert
+CONFIRMATION
+DEFAULTBUTTON DeleteToDoCancelButton
+BEGIN
+	TITLE "Delete To Do"
+	MESSAGE "Delete selected To Do item?"
+	BUTTONS "OK" "Cancel"
+END
+
+
+
+ALERT ID PurgeToDoAlert
+CONFIRMATION
+DEFAULTBUTTON PurgeToDoCancelButton
+BEGIN
+	TITLE "Purge"
+	MESSAGE "Delete all To Do items in the current category marked complete?"
+	BUTTON "OK" "Cancel"
+END
+
+
+
+ALERT ID SelectItemAlert
+INFORMATION
+BEGIN
+	TITLE "Select Item"
+	MESSAGE "You must have a record selected to perform this command. To select a record, tap on the description of the item."
+	BUTTONS "OK"
+END
+
+
+
+ALERT ID DeleteMemoAlert
+CONFIRMATION
+BEGIN
+	TITLE "Delete Memo"
+	MESSAGE "Clear text from memo page?"
+	BUTTONS "OK" "Cancel"
+END
+
+
+
+ALERT ID DeleteNoteAlert
+CONFIRMATION
+BEGIN
+	TITLE "Delete Note"
+	MESSAGE "Are you sure you wish to delete the note?"
+	BUTTONS "Yes" "No"
+END
+
+
+#ifdef CONFIG_DEF_CATEGORY
+	ALERT ID SelectCategoryAlert
+	WARNING
+	BEGIN
+		TITLE "Edit Default Categories"
+		MESSAGE "Select a category name."
+		BUTTON "OK"
+	END
+	
+	
+	
+	ALERT ID AllCategoriesUsedAlert
+	ERROR
+	BEGIN
+		TITLE "New Default Category"
+		MESSAGE "All categories are used. Please delete a category before adding another."
+		BUTTON "OK"
+	END
+#endif /* CONFIG_DEF_CATEGORY */
+
+
+ALERT ID AddedScannedDBsAlert
+INFORMATION
+BEGIN
+	TITLE "Databases found"
+	MESSAGE "There were ^1 databases found."
+	BUTTON "OK"
+END
+
+
+
+ALERT ID ScannedToDosAlert
+INFORMATION
+BEGIN
+	TITLE "Rescan ToDos"
+	MESSAGE "Total Items -> ^1\nFinished Items -> ^2"
+	BUTTON "OK"
+END
+
+
+
+// Strings ----------------------------------------------------------------------------------------
+
+#ifdef CONFIG_HLP_STRS
+	STRING ID DetailsHelpString 		"\x95 Instead of tapping the Details button, you can change a priority or due date directly by tapping it.\n\n\x95 The category you are currently viewing is assigned to new To Do items.\n\n\x95 After you set a due date, choose the Preferences menu item to access the Show Due Dates option.\n\n\x95 Tap on the \'Exp.\' button to export (copy) the current todo item to another project.\nAfter a list has popped up select the project you want to receive the todo item."
+	STRING ID ProjectNameHelpString "Instert a name for the new project you want to create.\n\nNote:\n\n\x95 Empty names are not valid.\n\n\x95 The name must be unique and no longer than 27 characters.\n\n\x95 Creating new new project creates a new ToDo Database on your device."
+	#ifdef CONFIG_DEF_CATEGORY
+		STRING ID DefaultCategoriesHelpString "Set default categories which will be assigned to databases that you create.\n\nNote that you do not need to assign \"Unfiled\" as a category name. This category is added by default and will always exist.\n\nUse the \"Ren.\" button to raname a category name.\n\nTo delete a name select it in the list and tap the \"Del.\" button.\n\nTo create a new category name tap the \"New\" button.\n\nConfirm all changes by tapping \"OK\" or discard them by using the \"Cnl.\" button."
+	#endif /* CONFIG_DEF_CATEGORY */
+#endif
+
+STRING ID SelectDueDateTitle		"Due Date"
+STRING ID SelectBeginDateTitle 	"Select Begin Date"
+STRING ID SelectEndDateTitle		"Select End Date"
+STRING ID ExpMemoNewRecFailed		"A new record in the Memo database couldn't be created."
+STRING ID ExpDBCantOpenError		"Database couldn't be opened."
+STRING ID ExpNewRecFailed 			"A new record couldn't be created in the appropriate database."
+STRING ID ErrorDBNotFound				"Database not found."
+
+STRING ID EnterANameForProject 	"Please enter a name and try again."
+STRING ID DBAlreadyExists				"There is already such a named database. Please enter a different name and try again."
+
+STRING ID ErrorDBNotCreated			"Database couldn't be created."
+STRING ID DuplicateProjectTitle "Duplicate Project"
+STRING ID NotAllRecordsCouldBeDuplicated "Not all records could be duplicated."
+STRING ID FindHeaderString			"Projects"
+STRING ID MemoDBNotFound				"The Memo database could not be opened. Please launch the Memo application and than try again."
+STRING ID ToDoDBName4Export			"[ToDo]"
+STRING ID DateDBName4Export			"[DateBook]"
+
+#ifdef CONFIG_ALLTODOS_DLG
+	STRING ID NoProjectsYet						"There are no projects listed. Make sure you can see some and try again."
+#endif /* CONFIG_ALLTODOS_DLG */
+
+#ifdef CONFIG_EXT_ABOUT
+	STRING ID ExtAboutTitle						"Projects v##VERSION##"
+	STRING ID	ExtAboutAuthor					"Peter Novotnik"
+	STRING ID ExtAboutEmail						"projects4palmos@gmx.net"
+	STRING ID ExtAboutWWW							"projects4palmos.sourceforge.net"
+	STRING ID ExtAboutLicence1				"This application is released"
+	STRING ID	ExtAboutLicence2				"under the terms of GPL."
+	STRING ID ExtAboutBuildTitle1			"This file was built with"
+	STRING ID ExtAboutFollowingFlagsString "the following flags:"
+	STRING ID	ExtAboutEppilog1				"For a description of the flags"
+	STRING ID ExtAboutEppilog2				"visit the project's home page."
+	STRING ID ExtAboutTranslatedBy		"English translation by"
+	STRING ID ExtAboutTranslator			"Peter Novotnik"
+	STRING ID	ExtAboutTranslatorEmail	"projects4palmos@gmx.net"
+#endif /* CONFIG_EXT_ABOUT */
+
+STRING ID	MemoLookupTitleString			"Memo Lookup"
+
+
+// Bitmaps ----------------------------------------------------------------------------------------
+
+BITMAP ID PreferencesBitmap "bitmaps/PreferencesIcon.bmp" TRANSPARENT 255 255 255
+
+#ifdef CONFIG_COLOR
+
+	BITMAPFAMILY ID AppIconBitmap "bitmaps/AppIconBig.bmp" "" "" "bitmaps/AppIconBig8Bit.bmp" TRANSPARENT 255 255 255
+	BITMAPFAMILY ID PopupTriangleBitmap "bitmaps/PopupTriangle.bmp" "" "" "bitmaps/PopupTriangle8Bit.bmp" TRANSPARENT 255 255 255
+
+	#ifdef CONFIG_SONY
+		BITMAPFAMILY ID AppIconBitmap64x64 "bitmaps/AppIconBig64x64.bmp" "" "" "bitmaps/AppIconBig64x64_8Bit.bmp" TRANSPARENT 255 255 255
+	#endif /* CONFIG_SONY */
+
+#else
+
+	BITMAP ID AppIconBitmap "bitmaps/AppIconBig.bmp" TRANSPARENT 255 255 255
+	BITMAP ID PopupTriangleBitmap "bitmaps/PopupTriangle.bmp" TRANSPARENT 255 255 255
+
+	#ifdef CONFIG_HANDERA
+		BITMAP ID AppIconBitmap+0x1000 "bitmaps/AppIcon48x33.bmp" TRANSPARENT 255 255 255
+		BITMAP ID PopupTriangleBitmap+0x1000 "bitmaps/PopupTriangle15x18.bmp" TRANSPARENT 255 255 255
+	#endif /* CONFIG_HANDERA */
+
+	#ifdef CONFIG_SONY
+		BITMAP ID AppIconBitmap64x64 "bitmaps/AppIconBig64x64.bmp" TRANSPARENT 255 255 255
+	#endif /* CONFIG_SONY */
+
+#endif /* CONFIG_COLOR */
+
+
+
+// Categories -------------------------------------------------------------------------------------
+
+CATEGORIES ID ProjectsCategoriesAppInfoStr "Unfiled" "Personal" "Business"
+CATEGORIES ID ProjectsToDoCategoriesAppInfoStr "Unfiled" "Basic" "Optional" "Planned"
+
+
+
+// Version ----------------------------------------------------------------------------------------
+
+VERSION "##VERSION##"
+
+
+// Icons ------------------------------------------------------------------------------------------
+
+#ifdef CONFIG_COLOR
+
+	ICONFAMILY "bitmaps/AppIconBig.bmp" "" "" "bitmaps/AppIconBig8Bit.bmp" TRANSPARENT 255 255 255
+	SMALLICONFAMILY "bitmaps/AppIconSmall.bmp" "" "" "bitmaps/AppIconSmall8Bit.bmp" TRANSPARENT 255 255 255
+
+#else
+
+	ICON "bitmaps/AppIconBig.bmp"
+	SMALLICON "bitmaps/AppIconSmall.bmp"
+
+	#ifdef CONFIG_HANDERA
+		ICON ID	2000	"bitmaps/AppIcon32x32.bmp"
+		ICON ID 2001	"bitmaps/AppIcon22x14.bmp"
+		ICON ID 2002	"bitmaps/AppIcon32x32inverted.bmp"
+	#endif /* CONFIG_HANDERA */
+
+#endif /* CONFIG_COLOR */
