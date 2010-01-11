@@ -1,0 +1,116 @@
+Projets: Programme de Base de Données Open Source pour Palm OS
+--------------------------------------------------------------
+
+*** ATTENTION: Bien que tous les efforts aient étés faits pour trouver
+*** et corriger les bugs de Projets, ce programme est toujours en cours
+*** de développement. Utilisez-le à vos risques et périls! Projets étant
+*** toujours en cours de développement, il peut contenir des bugs
+*** pouvant faire planter votre PDA et nécessiter un hard reset. (Un
+*** hard reset entraine une perte de données sur le PDA.)
+
+Projets est une application de base de données à base de fichiers pour
+les PDA compatibles Palm OS des sociétés telles que Palm, Handspring,
+HandEra et Sony. Grâce à Projets, vous pouvez créer plus d'une liste de
+tâches, contrairement à l'aplication fournie par défaut avec le système
+d'exploitation.
+
+Projets est un logiciel libre délivré sous les termes de la GNU General
+Public License (GPL). Lisez le fichier "COPYING" inclus avec cette
+distribution pour en apprendre plus sur la license GNU GPL.
+
+Projets étant touours en cours de développement, lisez le fichiers
+"NEWS" également inclus dans cette distribution pour connaitre les
+changements majeurs opérés depuis les versions précédentes.
+
+Installation
+------------
+
+Projets est disponible dans différentes versions (configurations). Vous
+pouvez télécharger le code source et compiler une version correspondant
+à vos besoins. Les versions ci-dessous sont disponibles sous forme de
+fichier binaire. Ces versions nécessitent la version 3.1 de Palm OS ou
+une version supérieure, sauf mention contraire. Les caractères '[??]'
+dans les noms de fichiers listés ci-dessous doivent être remplacés par
+...
+
+ ... 'En' -> Traduction anglaise (par Peter Novotnik)
+ ... 'Ge' -> Traduction allemande (par Peter Novotnik)
+ ... 'It' -> Traduction italienne (par Manuel Giorgini)
+ ... 'Fr' -> Traduction française (par Eric Santonacci)
+
+ Projects[??]BW.prc
+ - fonctionnalités basiques, couleur non supportée (noir et blanc)
+
+ Projects[??]Color.prc
+ - fonctionnalités basiques, couleur supportée
+
+ Projects[??]BWSony.prc
+ - fonctionnalités basiques, couleur non supportée (noir et blanc),
+ - support des écrans haute définition de Sony, version de l'os 3.5 au minimum
+
+ Projects[??]ColorSony.prc
+ - fonctionnalités basiques, couleur supportée,
+ - support des écrans haute définition et du JogDial de Sony, version de l'os
+   3.5 au minimum
+
+ Projects[??]HandEra.prc
+ - fonctionnalités basiques, couleur non supportée,
+ - support de l'écran haute définition et du JogDial du HandEra330, version
+   de l'os 3.5 au minimum
+
+L'étape suivante est l'installation effective de l'un de ces fichiers
+sur votre PDA. Les utilisateurs de Microsoft Windows et de Macintosh
+doivent utiliser l'outil d'installation du logiciel Palm Desktop afin
+d'installer l'un des fichiers PRC ci-dessus. Ensuite, effectuez une
+HotSync afin de terminer l'installation.
+
+Les utilisateurs d'Unix/Linux doivent utiliser un programme comme
+'pilot-xfer', qui fait partie du package pilot-link, afin d'installer
+l'un des fichiers PRC ci-dessus. (D'autres packages comme KPilot, JPilot
+et gnome-pilot marcheront tout aussi bien.)
+
+NOTE: L'installation de plusieurs versions de Projets en différents
+langages peut causer un petit problème. Si vous voyez deux icônes
+Projets dans le lanceur d'applications, vous avez deux versions de
+langage différent installées. Pour résoudre le problème, recupérez un
+outil tel que 'Filez' et supprimer la base de données éxécutable de
+l'application. La version anglaise s'intitule 'Projects', la version
+allemande 'Projekte' et la française 'Projects'. N'utilisez pas la
+fonction 'Supprimer...' du lanceur d'applications sous peine d'effacer
+toutes les données de Projets!!!
+
+Projets supporte le JogDial et les écrans haute résolution des PDA Sony
+et HandEra330. Cependant, vous devez désactiver JogAssistant sur les PDA
+Sony afin que Projets marche correctement avec cette fonction.
+
+Ressources (Web et E-Mail)
+--------------------------
+
+Vous pouvez trouver la dernière version de Projets sur le site web
+suivant:
+
+ http://projects4palmos.sourceforge.net
+
+Vous pouvez rejoindre la liste de diffusion pour vous tenir informé des
+nouvelles versions et des corrections de bugs. Pour savoir comment vous
+inscrire à cette liste de diffusion, visitez le site web suivant:
+
+ http://lists.sourceforge.net/lists/listinfo/projects4palmos-news
+
+Vous pouvez rejoindre une liste de discussion générale sur Projets.
+Pour savoir comment vous inscrire à cette liste de discussion, visitez
+le site web suivant:
+ 
+ http://lists.sourceforge.net/lists/listinfo/projects4palmos-general
+
+Le développement de Projets est hébergé sur SourceForge depuis un
+certain temps. SourceForge est le site d'hébergement de nombreux projets
+de logiciels open source, fourni par VA Linux Systems, Inc.  La page de
+Projects sur SourceForge se trouve à l'adresse suivante:
+
+ http://sourceforge.net/projects/projects4palmos
+
+---
+ Peter Novotnik <peternov1@gmx.de>
+ Traduction française: Fabien Guittard <fabz@nerim.net>
+ Mardi 3 Septembre 2002

@@ -1,0 +1,113 @@
+Projekte: OpenSource Datenbank-Programm für das PalmOS
+------------------------------------------------------
+
+*** ACHTUNG: Dieses Programm befindet sich noch in ENTWICKLUNG.  Benutzung
+*** auf eigene Gefahr! Da das Programm noch entwickelt wird kann es einen
+*** Absturz des PDAs erzeugen, so dass ein Hard Reset notwendig wird. (Ein
+*** Hard Reset führt zum Verlust aller Daten!)
+
+'Projekte' ist freie Software gemäss der 'GNU Public License', die in
+der beiliegenden Datei 'COPYING' enthalten ist.
+
+'Projekte' bietet die Verwaltung von Aufgabenpunkten wie die
+Standardanwendung 'Aufgaben' die mit dem PalmOS ausgeliefert wird.
+Allerdings erlaubt 'Projekte' mit mehreren solchen Listen zu arbeiten in
+welcher Hinsicht es die Standardanwendung erweitert.
+
+Während der Entwicklung von 'Projekte' wurden ab der Version 1.5
+tiefgreifende Veränderungen vorgenommen. Aus Effizienzgründen wird die
+Kompatilität zu früheren Versionen nicht unterstützt. Bei der
+Installation einer Version >= 1.5 muss sicher gestellt werden, dass alle
+Daten früherer Versionen vom PDA gelöscht sind, da dass Programm zu
+abstürzen führen könnte!
+
+
+Installation
+------------
+
+Zur Installation von 'Projekte' auf den PDA genügt es eine der .PRC
+Dateien aus diesem Zip Archiv zu installieren, die man entsprechend dem
+PDA aussuchen sollte. Die Zeichenfolge '[??]' in der folgenden
+Auflistung ist ein Platzhalter für ...
+
+  -> 'Ge' (German, Deutch)
+  -> 'En' (English, Englisch)
+  -> 'It' (Italian, Italienisch)
+  -> 'Fr' (French, Französisch)
+
+...  und signalisiert die Sprache, in der die Anwendung nach der Installation
+erscheint. Die minimale Betriebssystemversion für die Dateien ist 3.1, wenn
+nicht anders angegeben.
+
+  Projects[??]BW.prc
+    - ohne Farbunterstützung (schwarz/weiss)
+
+  Projects[??]Color.prc
+    - Farbunterstützung
+
+  Projects[??]BWSony.prc
+    - ohne Farbunterstützung
+    - Unterstützung des Hochauflösenden Displays bei Sony Geräten
+    - die minimale Betriebssystemversion is 3.5
+
+  Projects[??]ColorSony.prc
+    - Farbunterstützung
+    - Unterstützung des Hochauflösenden Displays bei Sony Geräten
+    - Unterstützung des JogDials bei Sony Geräten
+    - die minimale Betriebssystemversion is 3.5
+
+	Projects[??]HandEra.prc
+    - ohne Farbunterstützung
+    - Unterstützung des Hochauflösenden Displays bei HandEra330
+    - Unterstützung des JogDials bei HandEra330
+
+Der nächste Schritt die die Datei auf den PDA zu installieren. Microsoft
+Windows und Macintosh Benutzer sollten das Installationstool, das mit
+der Palm Desktop Software geliefert wird, benutzen.
+
+UNIX/Linux Benutzer können das Programm 'pilot-xfer', welches ein Teil
+des pilot-link Packets ist, benutzen, um die ausgewählte .PRC Datei zu
+installieren.  (Andere Pakete wie KPilot, JPilot oder gnome-pilot eignen
+sich genauso gut zur Installation.)
+
+Hinweise
+--------
+
+Sollte das Programmsymbol mehrfach aufgelistest sein, befinden sich
+mehrere Sprachversionen auf dem PDA. Um die ungewuenschte Sprachversion
+zu entfernen, ist ein Dateimanager wie z.B. 'Filez' (www.palmgear.com)
+nötig.  In diesem Dateimanager sollte man die unerwünschte Version der
+Programmdatenbank finden und löschen. Die Datenbank heisst in der
+englischen, italienischen und französischen Version 'Projects' während
+der Name 'Projekte' in der deutschen lautet. Auf alle Fälle einen
+Dateimanager verwenden, da ansonsten diese Operation zum Verlust aller
+Projektdaten führen könnte.
+
+'Projekte' unterstützt auch das JogDial, welches auf Geräten von Sony
+HandEra330 vorhanden ist. Bei Sony-Geräten muss jedoch der
+'JogAssistant' ausgeschaltet werden, damit 'Projekte' einwandfrei dieses
+Feature ausnutzen kann.
+
+Informationsquellen (Web und e-mail)
+------------------------------------
+
+Die jeweils aktuelle Version von 'Projekte' befindet sich auf der
+folgenden Web Seite:
+
+   http://projects4palmos.sourceforge.net
+
+Für Diskussionen zum Thema 'Projekte' gibt es eine Mailing Liste.
+Informationen zur Aufnahme in die Liste findet man auf der folgenden Web
+Seite:
+
+	http://lists.sourceforge.net/lists/listinfo/projects4palmos-general
+
+Die Entwicklung von 'Projekte' findet im Web Bereich von SourceForge
+statt.  Die Web Seite von 'Projekte' bei SourceForge ist wie folgt zu
+finden:
+
+	http://sourceforge.net/projects/projects4palmos
+
+---
+  Peter Novotnik <peternov1@gmx.de>
+	Tue Sep  3 15:18:26 CEST 2002

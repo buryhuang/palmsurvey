@@ -1,0 +1,109 @@
+Projects: Open Source Database Program for PalmOS
+-------------------------------------------------
+
+*** WARNING: While every effort has been made to find and remove bugs
+*** from Projects, it is still under active development. You use it at
+*** your own risk! Since Projects is still under active development,
+*** there may be bugs which will cause your PDA to crash to the point
+*** where a hard reset is required. (Hard resets cause loss of all data
+*** on the PDA.)
+
+Projects is a flat-file database application for PalmOS-compatile PDAs
+from companies such as Palm, Handspring, HandEra and Sony. Using
+Projects, you can create more than just one ToDo list like in the
+built-in ToDo application provided with the operating system.
+
+Projects is Free Software provided under the terms of the GNU General
+Public License (GPL). Read the file "COPYING" that is included in this
+distribution to learn more about the GNU GPL.
+
+Since Projects is under constant development, read the file "NEWS" also
+included in this distribution to learn what major changes have taken
+place since previous releases.
+
+Installation
+------------
+
+Projects is available in different version (configurations). You can can
+download the source code and build a special version satisfying your
+needs. With the binary package there are shiped the following versions.
+The versions require a Palm OS version of 3.1 or above if not otherwise
+specified. At the current time the character secquence '[??]' in the
+listed files below is replaced by ...
+
+ ... 'En' -> English translation (by Peter Novotnik)
+ ... 'Ge' -> German translation (by Peter Novotnik)
+ ... 'It' -> Italian translation (by Manuel Giorgini)
+ ... 'Fr' -> French translation (by Eric Santonacci)
+
+ Projects[??]BW.prc
+ - basic functionality, no color support (black/white)
+
+ Projects[??]Color.prc
+ - basic functionality, support for colors
+
+ Projects[??]BWSony.prc
+ - basic functionality, no color support (black/white),
+ - support of sony's high screen resolution, min. required os version 3.5
+
+ Projects[??]ColorSony.prc
+ - basic functionality, support for color,
+ - support of sony's high screen resolution and JogDial, min. required os version 3.5
+
+ Projects[??]HandEra.prc
+ - basic functionality, no support for colors,
+ - support of HandEra330's high resolution screen and JogDial, min. required os version 3.5
+
+The next step is to actually install one of those files above on the PDA.
+Users of Microsoft Windows and the Macintosh should use the Install Tool
+that comes with the Palm Desktop software to install one of the above
+listed PRC files. Afterwards, initiate a HotSync to complete
+the installation.
+
+UNIX/Linux users should use a program like 'pilot-xfer' which is a
+part of the pilot-link package to install one of the above PRC files.
+(Other packages like KPilot, JPilot and gnome-pilot will work just as
+well.)
+
+NOTE that if you install different language versions of Projects it may
+cause a small problem. If you see the Projects' symbol twice in the
+application laucher you have two different language versions installed.
+To fix this problem get a tool like 'Filez' and delete the application
+executable database. The english, italian and french application database 
+reads 'Projects' and the german 'Projekte'. Do NOT use the 'Delete...' 
+menu item of the application launcher or you will earse all your Projects
+data!
+
+Projects supports also JogDial and high resolution screens available on 
+Sony and HandEra330 devices. However you need to disable JogAssistant on 
+Sony devices to make Projects work properly with this feature.
+
+Resources (Web and E-Mail)
+--------------------------
+
+You can find the latest version of Projects at the following Web site:
+
+ http://projects4palmos.sourceforge.net
+
+You can also join a mailing list to get notification of new releases and
+bug fixes. To learn how to subscribe to this mailing list, just visit the
+following Web site:
+
+ http://lists.sourceforge.net/lists/listinfo/projects4palmos-news
+
+You can join a mailing list for general discussion of Projects. To
+learn how to subscribe to this mailing list, just visit the following
+Web site:
+ 
+ http://lists.sourceforge.net/lists/listinfo/projects4palmos-general
+
+Development of Projects has been hosted at SourceForge for some time.
+SourceForge is a hosting site for many Open Source software projects
+provided by VA Linux Systems, Inc. Projects' particular project page
+on SourceForge is at the following Web site:
+
+ http://sourceforge.net/projects/projects4palmos
+
+---
+ Peter Novotnik <peternov1@gmx.de>
+ Tue Sep  3 15:18:34 CEST 2002
