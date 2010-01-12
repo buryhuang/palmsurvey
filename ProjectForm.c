@@ -1971,6 +1971,9 @@ static void ProjectFormDeleteToDo( void )
 
 	ErrFatalDisplayIf( !gCurrentProject.todoDB, "database is not open" );
 
+	if(strncmp(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen-1)!=0)
+		return (false);
+
 	if( !gToDoItemSelected )
 	{
 		FrmAlert( SelectItemAlert );
