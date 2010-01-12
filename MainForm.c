@@ -1276,13 +1276,24 @@ static void MainFormHandleNewProjectRequest( void )
 	DmOpenRef			db = 0;
 	UInt16				index = kNoRecordIndex;
 	const Char surveyPrjName[] = "Nursing Survey";
+	ControlType * 		popP;
 	ListType *			listP;
+	Int16				curSel;
+	Char *				labelP;
 
 	// get the name for the new database ----------------------------------------
 	frmP = FrmGetActiveForm();
 	newP = FrmInitForm( ProjectNameForm );
-	fieldIndex = FrmGetObjectIndex( newP, ProjectNameFormNameField );
+	//fieldIndex = FrmGetObjectIndex( newP, ProjectNameFormNameField );
 	//FrmSetEventHandler( newP, ProjectNameFormHandleEvent );
+
+	//popP = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, LoginNamePopTrigger ) );
+	listP = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, LoginNameList ) );
+	//labelP = (Char *)CtlGetLabel( popP );
+	//StrCopy( labelP, LstGetSelectionText( listP, 0 ) );
+	//CtlSetLabel( popP, labelP );
+	//LstSetSelection( listP, 0 );
+	
 	FrmSetActiveForm( newP );
 	FrmSetFocus( newP, fieldIndex );
 
@@ -1293,10 +1304,10 @@ static void MainFormHandleNewProjectRequest( void )
 
 	if( FrmDoDialog( newP ) == ProjectNameFormOKButton )
 	{
-		//listP = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, LoginNameList ) );
-		//StrNCopy(gGlobalPrefs.loginName,LstGetSelectionText( listP, 0) ,kLoginNameMaxLen);
-		//gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
-		StrNCopy(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen);
+		curSel = LstGetSelection( listP );
+		StrNCopy(gGlobalPrefs.loginName,LstGetSelectionText( listP, curSel) ,kLoginNameMaxLen);
+		gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
+		//StrNCopy(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen);
 
 		// if we get here, we can rely on the uniqueness of the name
 		//fieldP = FrmGetObjectPtr( newP, fieldIndex );
@@ -1426,7 +1437,7 @@ static void MainFormInit( FormType * frmP )
 	CategorySetTriggerLabel( controlP, labelP );
 
 	if(gGlobalPrefs.loginName[0] != 0) {
-		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, MainNewButton ) ),"Logout");
+		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, MainNewButton ) ),gGlobalPrefs.loginName);
 	}
 
 #ifdef CONFIG_HANDERA

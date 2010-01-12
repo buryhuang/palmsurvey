@@ -18,9 +18,9 @@ BEGIN
  	REPEATBUTTON "\x01" ID MainScrollUpRepeating AT(147 144 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
   REPEATBUTTON "\x02" ID MainScrollDownRepeating AT(147 152 13 8) USABLE LEFTANCHOR NOFRAME FONT 5
 
-	BUTTON "Login" ID MainNewButton AT (1 147 26 12)
+	BUTTON "Login" ID MainNewButton AT (1 147 76 12)
 #ifdef CONFIG_ALLTODOS_DLG
-  BUTTON "ToDos" ID MainToDoButton AT (PREVRIGHT+4 PREVTOP 34 12)
+  BUTTON "History" ID MainToDoButton AT (PREVRIGHT+4 PREVTOP 34 12)
 #endif /* CONFIG_ALLTODOS_DLG */
 	BUTTON "Show ..." ID MainShowButton AT (PREVRIGHT+4 PREVTOP 38 12)
 
@@ -184,11 +184,11 @@ USABLE
 DEFAULTBTNID ProjectNameFormCancelButton
 MENUID EditMenu
 BEGIN
-	TITLE "New Project"
+	TITLE "Log In"
 
 	LABEL "Choose your name:" AUTOID AT (4 16) USABLE FONT 1
 	POPUPTRIGGER "Cooper,Sheldon" ID LoginNamePopTrigger AT(14 PREVBOTTOM+1 AUTO AUTO) LEFTANCHOR USABLE FONT 0
-	LIST "Jones,Smantha" "Bradshaw,Carrie" "York,Chorlotte" "Hobbes,Miranda" "Hofstadter,Leonard" "Cooper,Sheldon" "Wolowitz,Howard" "Koothrappali,Rajesh" PreferencesSortList AT(PREVLEFT+13 PREVTOP-11 PREVWIDTH-13 88) NONUSABLE VISIBLEITEMS 8 FONT 0
+	LIST "Cooper,Sheldon" "Bradshaw,Carrie" "York,Chorlotte" "Hobbes,Miranda" "Hofstadter,Leonard" "Jones,Smantha" "Wolowitz,Howard" "Koothrappali,Rajesh" LoginNameList AT(PREVLEFT+13 PREVTOP-11 PREVWIDTH-13 88) NONUSABLE VISIBLEITEMS 8 FONT 0
 	POPUPLIST ID LoginNamePopTrigger LoginNameList
 	/* FIELD ID ProjectNameFormNameField AT (PREVLEFT 28 145 12) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE MAXCHARS 27 AUTOSHIFT */
 	BUTTON "OK" ID ProjectNameFormOKButton AT (PREVLEFT BOTTOM@57 38 AUTO) USABLE FRAME FONT 0
