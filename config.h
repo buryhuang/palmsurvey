@@ -4,32 +4,32 @@
 
 /* support for a colored version */
 /* undefine CONFIG_COLOR for b/w version */
-//#undef CONFIG_COLOR
-#define CONFIG_COLOR
+#undef CONFIG_COLOR
+//#define CONFIG_COLOR
 
 
 /* supprot for system os version below 3.5 */
 /* undefine the CONFIG_OS_BELOW_35 for a version that requires os ver >= 3.5 */
-//#undef CONFIG_OS_BELOW_35
-#define CONFIG_OS_BELOW_35
+#undef CONFIG_OS_BELOW_35
+//#define CONFIG_OS_BELOW_35
 
 
 /* support for the extended about dialog box */
 /* undefine the CONFIG_EXT_ABOUT for a version with a simple about dialog */
-//#undef CONFIG_EXT_ABOUT
-#define CONFIG_EXT_ABOUT
+#undef CONFIG_EXT_ABOUT
+//#define CONFIG_EXT_ABOUT
 
 
 /* supprot for helpstrings */
 /* undefine the CONFIG_HLP_STRS for a smaller version */
-//#undef CONFIG_HLP_STRS
-#define CONFIG_HLP_STRS
+#undef CONFIG_HLP_STRS
+//#define CONFIG_HLP_STRS
 
 
 /* suppor for additional features */
 /* undef the CONFIG_ADDITIONAL for a smaller version without */
-//#undef CONFIG_ADDITIONAL
-#define CONFIG_ADDITIONAL
+#undef CONFIG_ADDITIONAL
+//#define CONFIG_ADDITIONAL
 
 
 /* support for the alltodos dialog on the mainform

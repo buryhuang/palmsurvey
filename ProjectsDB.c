@@ -555,6 +555,83 @@ DmOpenRef PrjtDBGetMainDB( Boolean create, UInt16 openMode )
 	return (db);
 }
 
+DmOpenRef PrjtDBOpenHistDB( Char * name)
+{
+	LocalID			dbID;
+	DmOpenRef		db = 0;
+
+	ErrFatalDisplayIf( !name, "invalid param" );
+
+
+	db = PrjtDBOpenToDoDB( name, dmModeReadWrite );
+	if(!db)
+		db = PrjtDBCreateToDoDB( name, false );
+
+	return (db);
+}
+
+void PrjtDBCreateHistEntry(Char* name, Char* desc)
+{
+	PrjtToDoHistType*		histP;
+	PrjtToDoHistType		hist;
+	MemHandle			h;
+	DateTimeType			timeNow;
+	DmOpenRef			db=0;
+	UInt16				index;
+	UInt16				len=0;
+	
+	
+	db=PrjtDBOpenHistDB(kSurveyHistDBName);
+	if(db) {
+		h=DmNewRecord(db,&index,sizeof(PrjtToDoHistType));
+		if(h) {
+			histP = MemHandleLock( h );
+			
+			TimSecondsToDateTime(TimGetSeconds(),&timeNow);
+			
+			StrPrintF(hist.year,"%04d",timeNow.year);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, year), hist.year, sizeof( hist.year) );
+
+			StrPrintF(hist.month,"%02d",timeNow.month);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, month), hist.month, sizeof( hist.month) );
+
+			StrPrintF(hist.day,"%02d",timeNow.day);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, day), hist.day, sizeof( hist.day) );			
+
+			StrPrintF(hist.hour,"%02d",timeNow.hour);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, hour), hist.hour, sizeof( hist.hour) );	
+
+			StrPrintF(hist.minute,"%02d",timeNow.minute);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, minute), hist.minute, sizeof( hist.minute) );	
+
+			StrPrintF(hist.second,"%02d",timeNow.second);
+			DmWrite( histP, OffsetOf( PrjtToDoHistType, second), hist.second, sizeof( hist.second) );	
+
+			len = StrLen(name);
+			len=kHistNameMaxLen < len?kHistNameMaxLen:len;
+			DmWrite( histP,OffsetOf( PrjtToDoHistType, user), name, len);
+			len=kHistNameMaxLen-len;
+			while(len>0) {
+				DmWrite( histP,OffsetOf( PrjtToDoHistType, user)+kHistNameMaxLen-len, "\0", 1);
+				len--;
+			}
+			
+			len = StrLen(desc);
+			len=kHistDescMaxLen < len?kHistDescMaxLen:len;
+			DmWrite( histP,OffsetOf( PrjtToDoHistType, description),desc, len);
+			len=kHistDescMaxLen-len;
+			while(len>0) {
+				DmWrite( histP,OffsetOf( PrjtToDoHistType, description)+kHistDescMaxLen-len, "\0", 1);
+				len--;
+			}
+			
+			MemHandleUnlock( h );
+			DmReleaseRecord( db, index, true );
+		}
+		DmCloseDatabase(db);
+	}
+}
+
 /*
  * FUNCTION:					PrjtDBOpenToDoDB
  * DESCRIPTION:				this routine opens a todo database given its project name

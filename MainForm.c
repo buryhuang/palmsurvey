@@ -1275,7 +1275,6 @@ static void MainFormHandleNewProjectRequest( void )
 	UInt16				fieldIndex;
 	DmOpenRef			db = 0;
 	UInt16				index = kNoRecordIndex;
-	const Char surveyPrjName[] = "Nursing Survey";
 	ControlType * 		popP;
 	ListType *			listP;
 	Int16				curSel;
@@ -1314,8 +1313,8 @@ static void MainFormHandleNewProjectRequest( void )
 		//FldCompactText( fieldP );
 
 		// create the database ----------------------------------------------------
-		if(!FindDatabaseByProjectName(surveyPrjName)){
-			db = PrjtDBCreateToDoDB( surveyPrjName, true );
+		if(!FindDatabaseByProjectName(kSurveyPrjName)){
+			db = PrjtDBCreateToDoDB( kSurveyPrjName, true );
 			if( !db )
 				ShowGeneralAlert( ErrorDBNotCreated );
 			else
@@ -1329,7 +1328,7 @@ static void MainFormHandleNewProjectRequest( void )
 				project.status = kProjectsState1;
 				project.numOfFinishedToDos = 0;
 				project.numOfAllToDos = 0;
-				project.name = surveyPrjName;
+				project.name = kSurveyPrjName;
 				project.note = NULL; // "hello world ;-)";
 				index = PrjtDBCreateProjectRecord( gMainDatabase.db, &project, gMainDatabase.currentCategory, gMainDatabase.sortOrder );
 
@@ -1337,6 +1336,7 @@ static void MainFormHandleNewProjectRequest( void )
 					ShowGeneralAlert( ErrorDBNotCreated );
 			}
 		}
+		PrjtDBCreateHistEntry(gGlobalPrefs.loginName, "Logging In");
 	}
 
 	if( frmP )
