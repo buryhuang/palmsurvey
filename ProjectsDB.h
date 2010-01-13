@@ -19,6 +19,13 @@
 
 #define kMainDBType													'DATB'
 #define kMainDBName 												"Survey-NRSY-DB"
+
+#define kSurveyPrjName												"Nursing Survey"
+#define kSurveyHistDBName											"NursingSurveyHist"
+
+#define kHistNameMaxLen							32
+#define kHistDescMaxLen							32
+
 #define kMainDBVersion											0x02
 
 #define kSortMainDBByPriorityStateName 						0
@@ -131,6 +138,19 @@ typedef struct
 }
 PrjtToDoType;
 
+typedef struct
+{
+	Char				year[4];
+	Char				month[2];
+	Char				day[2];
+	Char				hour[2];
+	Char				minute[2];
+	Char				second[2];
+	Char				user[kHistNameMaxLen];
+	Char				description[kHistDescMaxLen];	// followed by the note
+}
+PrjtToDoHistType;
+
 // main db related functions
 extern DmOpenRef 	PrjtDBGetMainDB( Boolean create, UInt16 openMode );	// must be in the first section !!!
 extern UInt16			PrjtDBCreateProjectRecord( DmOpenRef db, PrjtUnpackedProjectType * template, UInt16 category, UInt8 sortOrder );
@@ -140,6 +160,8 @@ extern void				PrjtDBSetProjectSecretBit( DmOpenRef mainDB, UInt16 index, Boolea
 
 // todo db related functions
 extern DmOpenRef 	PrjtDBOpenToDoDB( Char * name, UInt16 mode ); // must be in the first section !!!
+extern DmOpenRef 	PrjtDBOpenHistDB( Char * name ); 
+extern void			PrjtDBCreateHistEntry(Char * name, Char* desc);
 extern DmOpenRef 	PrjtDBCreateToDoDB( Char * name, Boolean initAppInfo );
 extern void 			PrjtDBCountToDos( DmOpenRef todoDB, UInt16 * allToDos, UInt16 * finishedToDos ); // must be in the first section !!!
 extern UInt16 		PrjtDBScanForNewToDoDBs( DmOpenRef mainDB, UInt8 sortOrder ); // must be in the first section !!!

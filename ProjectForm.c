@@ -2377,22 +2377,27 @@ static void	ProjectFormToDoTableResizeDescription( EventType * eventP )
  */
 void ProjectFormToggleToDoCompleted( EventType * eventP )
 {
-  TableType   * 					tableP;
-	UInt16									recIndex;
-  Int16         					row;
-	DateType								today;
-	Boolean									complete;
+  	TableType   * 						tableP;
+	UInt16							recIndex;
+	Int16         						row;
+	DateType							today;
+	Boolean							complete;
+	Char							buff[kHistDescMaxLen];
 
-  tableP = eventP->data.tblSelect.pTable;
-  row = eventP->data.tblSelect.row;
+	tableP = eventP->data.tblSelect.pTable;
+	row = eventP->data.tblSelect.row;
 	recIndex	= TblGetRowID( tableP, row );
+	StrPrintF(buff,"toggled %d,%d",row,recIndex);
+	PrjtDBCreateHistEntry(gGlobalPrefs.loginName, buff);
 
+	#if 0
 	complete = PrjtDBToDoToggleCompletionFlag( 
 			gMainDatabase.db, gCurrentProject.projIndex,
 			gCurrentProject.todoDB, recIndex, gGlobalPrefs.completeToDoDueDate );
-
+	#endif
+	complete = 0;
 	if( complete )
-  {
+	{
 		if( gGlobalPrefs.showCompleteToDos && gGlobalPrefs.completeToDoDueDate )
 		{
 			// if the record's due date was mark it has been set to today
@@ -2401,9 +2406,9 @@ void ProjectFormToggleToDoCompleted( EventType * eventP )
 			TblSetItemInt( tableP, row, kProjectFormDueDateTableColumn, DateToInt( today ) );
 			TblMarkRowInvalid( tableP, row );
 		}
-    else
+		else
 			ProjectFormLoadToDoTable( true );
-  }
+	}
 	else
 		TblMarkRowInvalid( tableP, row );
 
