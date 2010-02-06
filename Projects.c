@@ -1221,6 +1221,7 @@ UInt32 PilotMain( UInt16 cmd, void * cmdPBP, UInt16 launchFlags )
 	switch( cmd )
 	{
 		case sysAppLaunchCmdNormalLaunch:
+		//case sysAppLaunchCmdDisplayAlarm:
 			//HostTraceInit();
 			error = AppStart( &formID );
 			if (error) 
@@ -1238,6 +1239,11 @@ UInt32 PilotMain( UInt16 cmd, void * cmdPBP, UInt16 launchFlags )
 			Search( (FindParamsType *)cmdPBP );
 			break;
 
+		case sysAppLaunchCmdAlarmTriggered:
+			((SysAlarmTriggeredParamType *)cmdPBP)->purgeAlarm = true; // suppresses sysAppLaunchCmdDisplayAlarm
+			SndPlaySystemSound(sndAlarm);
+			break;
+			
 		case sysAppLaunchCmdGoTo:
 			FtrPtrFree( appFileCreator, kLastVisitedPrjtIndexFeatureNum );
 			if( launchFlags & sysAppLaunchFlagNewGlobals )

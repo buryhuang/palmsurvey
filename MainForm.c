@@ -1249,7 +1249,24 @@ static void MainFormLoadTable( void )
 	FrmUpdateScrollers( frmP, upIndex, downIndex, upEnable, downEnable );
 }
 
+static Err  SetAlert(UInt32 delay, UInt32 refParam) {
+    Err error = errNone;
+    UInt32 alarmTime;
+    UInt16 cardNo;
+    LocalID dbID;
+    DmSearchStateType searchInfo;
 
+    /* find out what is the local program ID for the current program */
+    error = DmGetNextDatabaseByTypeCreator(true, &searchInfo, sysFileTApplication, appFileCreator, false, &cardNo, &dbID);
+    if (error!=errNone) return(error);
+
+    /* calculate the alert time */    
+    alarmTime = TimGetSeconds() + delay;
+
+    /* set the alert */
+    error = AlmSetAlarm(cardNo, dbID, refParam, alarmTime, true);
+    return(error);
+}
 
 /*
  * FUNCTION:			MainFormHandleNewProjectRequest
@@ -1337,6 +1354,9 @@ static void MainFormHandleNewProjectRequest( void )
 			}
 		}
 		PrjtDBCreateHistEntry(gGlobalPrefs.loginName, "Logging In");
+		if(StrCompare(gGlobalPrefs.loginName,"Bradshaw,Carrie")==0){
+			SetAlert(30,0);
+		}
 	}
 
 	if( frmP )
