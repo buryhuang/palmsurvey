@@ -8,7 +8,7 @@ OPT_COMP_FLAGS = -DERROR_CHECK_LEVEL="ERROR_CHECK_FULL"
 
 
 APP 			=	Survey$(LANG)
-APPID 		=	PRJT
+APPID 		=	NRSY
 ICONTEXT	=	"Survey$(LANG)"
 RCP 			=	$(APP).rcp
 RCP_IN		=	$(RCP).in
