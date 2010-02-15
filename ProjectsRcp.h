@@ -336,6 +336,25 @@
 
 #define LoginNamePopTrigger							1035
 #define LoginNameList								1036
+#define StudentNamePopTrigger						1037
+#define StudentNameList								1038
+#define LogoutAlert									1039
+#define InteractionForm								1040
+#define InteractionPopTrigger							1041
+#define InteractionList								1042
+
+#define ImportancePopTrigger						1043
+#define ImportanceList								1044
+
+#define InteractionNextButton							1045
+
+#define ProjectChngIntActionButton					1046
+
+#define ProjectLoginLabel								1047
+#define ProjectStudentLabel							1048
+
+#define ActionLoggingAlert							1049
+
 
 
 // bitmaps ----------------------------------------------------------------------------------------

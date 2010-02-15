@@ -139,6 +139,7 @@ static void 		DetailsFormApply( UInt16 category, DateType *dueDateP ); //, Boole
 static void 		DetailsFormExportItem( UInt16 category, DateType * dueDate ) THIRD_SECTION;
 static void 		DetailsFormSetDateTrigger( DateType date );
 static void 		DetailsFormInit( FormType *frmP, UInt16 *categoryP, DateType *dueDateP );
+static void 		InteractionFormInit( FormType *frmP, UInt16 *categoryP );
 static void 		DetailsFormExportListDrawFunc( Int16 itemNum, RectangleType * bounds, UInt16 ** recordIndexes );
 
 // details form fucntions -------------------------------------------------------------------------
@@ -350,6 +351,26 @@ static void DetailsFormSetDateTrigger( DateType date )
 		LstSetSelection( listP, kDueDateListChooseDateIndex );
 	}
 }
+
+static void InteractionFormInit( FormType *frmP, UInt16 *categoryP )
+{
+	UInt16			attr;
+	UInt16			category;
+	UInt16			priority;
+	MemHandle 	recH;
+	PrjtToDoType * 	recP;
+	Char *			labelP;
+	ControlType * controlP;
+
+	ErrFatalDisplayIf( !gCurrentProject.todoDB, "database is not open" );
+
+#ifdef CONFIG_HANDERA
+	if( gGlobalPrefs.vgaExtension )
+		VgaFormModify( frmP, vgaFormModify160To240 );
+#endif /* CONFIG_HANDERA */
+
+}	
+
 
 static void DetailsFormInit( FormType *frmP, UInt16 *categoryP, DateType *dueDateP )
 {
@@ -753,6 +774,66 @@ static void DetailsFormExportItem( UInt16 category, DateType * dueDate )
 		return;
 	}
 }
+
+Boolean InteractionFormHandleEvent( EventType * eventP )
+{
+	static UInt16		category;
+	static Boolean	categoryEdited;
+
+	Boolean handled = false;
+	FormType * frmP;
+
+	switch( eventP->eType )
+	{
+#ifdef CONFIG_JOGDIAL
+		case keyDownEvent:
+	#ifdef CONFIG_SONY
+			if( eventP->data.keyDown.chr == vchrJogBack )
+	#else
+			#ifndef CONFIG_HANDERA
+				#error "please define CONFIG_HANDERA or CONFIG_SONY or remove the CONFIG_JOG definition!"
+			#endif /* CONFIG_HANDERA */
+			if( eventP->data.keyDown.chr == chrEscape )
+	#endif /* CONFIG_SONY */
+			{ 
+				FrmReturnToForm(0);
+				ErrNonFatalDisplayIf( !gToDoItemSelected, "details on no selected item" );
+				ProjectFormToDoRestoreEditState();
+				handled = true;
+			}
+			break;
+#endif /* CONFIG_JOGDIAL */
+
+		case frmOpenEvent:
+			frmP = FrmGetActiveForm();
+			//InteractionFormInit(frmP, &category);
+			FrmDrawForm( frmP );
+			handled = true;
+			break;
+
+		case ctlSelectEvent:
+			switch( eventP->data.ctlSelect.controlID )
+			{
+				case InteractionNextButton:
+					FrmEraseForm(FrmGetActiveForm());
+					FrmGotoForm(ProjectForm);
+					// as long as we dont provide update code we just pass 0 as the second param
+					FrmUpdateForm( ProjectForm, 0 );
+					handled = true;
+					break;
+
+				default:
+					break;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	return (handled);
+}
+
 
 /*
  * FUNCTION:      DetailsFormHandleEvent
@@ -1971,7 +2052,7 @@ static void ProjectFormDeleteToDo( void )
 
 	ErrFatalDisplayIf( !gCurrentProject.todoDB, "database is not open" );
 
-	if(strncmp(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen-1)!=0)
+	if(!IsLoggedIn("Hofstadter,Leonard"))
 		return (false);
 
 	if( !gToDoItemSelected )
@@ -2387,8 +2468,14 @@ void ProjectFormToggleToDoCompleted( EventType * eventP )
 	tableP = eventP->data.tblSelect.pTable;
 	row = eventP->data.tblSelect.row;
 	recIndex	= TblGetRowID( tableP, row );
-	StrPrintF(buff,"toggled %d,%d",row,recIndex);
-	PrjtDBCreateHistEntry(gGlobalPrefs.loginName, buff);
+	if(FrmAlert(ActionLoggingAlert)==0) {
+		if(IsLoggedIn(NULL)) {
+			StrPrintF(buff,"toggled %d,%d",row,recIndex);
+			PrjtDBCreateHistEntry(gGlobalPrefs.loginName, buff);
+		}
+	}
+	FrmEraseForm(FrmGetActiveForm());
+	FrmGotoForm(ProjectForm);
 
 	#if 0
 	complete = PrjtDBToDoToggleCompletionFlag( 
@@ -4007,11 +4094,17 @@ static void	ProjectFormSwitchToToDoPage( FormType * frmP, Boolean drawtable )
 		FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectCreateDBButton ) );
 	}
 
-	if(strncmp(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen-1)!=0) {
+	if(!IsLoggedIn("Hofstadter,Leonard")) {
 		FrmHideObject( frmP, FrmGetObjectIndex( frmP, ProjectNewToDoButton));
 	} else {
 		FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectNewToDoButton));
 	}
+
+	if(IsLoggedIn(NULL)) {
+		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, ProjectLoginLabel ) ),gGlobalPrefs.loginName);
+	}
+
+	FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectChngIntActionButton ) );
 
 	gCurrentProject.currentPage = ToDoPage;
 }
@@ -5371,10 +5464,7 @@ Boolean ProjectFormHandleEvent( EventType * eventP )
 
 				case ProjectDetailsToDoButton:
 					// dont clear the edit state here
-					if( !gToDoItemSelected )
-						FrmAlert( SelectItemAlert );
-					else
-						FrmPopupForm( ToDoDetailsForm );
+					FrmGotoForm( InteractionForm );
 					handled = true;
 					break;
 
@@ -5388,10 +5478,13 @@ Boolean ProjectFormHandleEvent( EventType * eventP )
 					break;
 
 				case ProjectDoneButton:
-					if( gCurrentProject.currentPage == ToDoPage )
-						ProjectFormToDoClearEditState();
-					FrmGotoForm( MainForm );
-					handled = true;
+					if(FrmAlert(LogoutAlert)==0) {//OK;
+						Logout();
+						if( gCurrentProject.currentPage == ToDoPage )
+							ProjectFormToDoClearEditState();
+						FrmGotoForm( MainForm );
+						handled = true;
+					}
 					break;
 
 				case ProjectCreateDBButton:

@@ -66,6 +66,34 @@ static void 		DrawMatch( Char * prjtName, Char * descP, RectangleType * bounds )
 
 
 // globaly used functions (implementation) --------------------------------------------------------
+Boolean IsLoggedIn(Char * name)
+{
+	if(name == NULL)
+	{
+		return (!(gGlobalPrefs.loginName[0] == 0));
+	}
+	return (!strncmp(gGlobalPrefs.loginName,name,kLoginNameMaxLen-1));
+}
+
+void Logout()
+{
+	if(IsLoggedIn(NULL)) {
+		gGlobalPrefs.loginName[0] = 0;
+	}
+}
+
+void Login(Char * name, Char * studentName)
+{
+	StrNCopy(gGlobalPrefs.loginName,name ,kLoginNameMaxLen);
+	gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
+	//StrNCopy(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen);
+
+	if(studentName != NULL) {
+		StrNCopy(gGlobalPrefs.studentName,studentName ,kLoginNameMaxLen);
+		gGlobalPrefs.studentName[kLoginNameMaxLen-1]=0;
+	}
+}
+
 
 /*
  * FUNCTION:			ToDoItemIsDue
@@ -521,6 +549,10 @@ static Boolean AppHandleEvent( EventType * eventP )
 				FrmSetEventHandler(frmP, DetailsFormHandleEvent);
 				break;
 
+			case InteractionForm:
+				FrmSetEventHandler(frmP, InteractionFormHandleEvent);
+				break;
+
 #ifdef CONFIG_EXT_ABOUT
 			case ExtAboutDialog:
 				FrmSetEventHandler( frmP, ExtAboutHandleEvent );
@@ -578,7 +610,7 @@ static void AppEventLoop( void )
  * 									that was active when our app was closed last time
  * RETURNS:					0 - on success, else non-zero
  */
-static Err AppStart( UInt16 * formID )
+static Err  AppStart( UInt16 * formID )
 {
 	ProjectsPreferencesType prefs;
 	UInt32	tmp_ui32;
@@ -743,7 +775,7 @@ static Err AppStart( UInt16 * formID )
 		gGlobalPrefs.noteFont = prefs.noteFormFont;
 		gGlobalPrefs.allToDosFont = prefs.allToDosFont;
 
-		gGlobalPrefs.loginName[0] = 0;
+//		Logout();
 
 		if( prefs.flags & kGeneralPageFlag )
 			gCurrentProject.currentPage = GeneralPage;
