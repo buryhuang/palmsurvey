@@ -1191,7 +1191,7 @@ static void MainFormLoadTable( void )
 	lastVisibleRecordIndex = gTopVisibleProjectIndex;
 	recIndex = gTopVisibleProjectIndex;
 
-	if(gGlobalPrefs.loginName[0] == 0) {
+	if(IsLoggedIn(NULL)) {
 		numFitInTable = 0;
 	}
 	
@@ -1294,7 +1294,9 @@ static void MainFormHandleNewProjectRequest( void )
 	UInt16				index = kNoRecordIndex;
 	ControlType * 		popP;
 	ListType *			listP;
+	ListType *			listP2;
 	Int16				curSel;
+	Int16				curSel2;
 	Char *				labelP;
 
 	// get the name for the new database ----------------------------------------
@@ -1309,6 +1311,7 @@ static void MainFormHandleNewProjectRequest( void )
 	//StrCopy( labelP, LstGetSelectionText( listP, 0 ) );
 	//CtlSetLabel( popP, labelP );
 	//LstSetSelection( listP, 0 );
+	listP2 = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, StudentNameList ) );
 	
 	FrmSetActiveForm( newP );
 	FrmSetFocus( newP, fieldIndex );
@@ -1321,9 +1324,9 @@ static void MainFormHandleNewProjectRequest( void )
 	if( FrmDoDialog( newP ) == ProjectNameFormOKButton )
 	{
 		curSel = LstGetSelection( listP );
-		StrNCopy(gGlobalPrefs.loginName,LstGetSelectionText( listP, curSel) ,kLoginNameMaxLen);
-		gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
-		//StrNCopy(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen);
+		curSel2 = LstGetSelection( listP2 );
+		Login(LstGetSelectionText( listP, curSel),LstGetSelectionText( listP2, curSel2));
+
 
 		// if we get here, we can rely on the uniqueness of the name
 		//fieldP = FrmGetObjectPtr( newP, fieldIndex );
@@ -1353,8 +1356,10 @@ static void MainFormHandleNewProjectRequest( void )
 					ShowGeneralAlert( ErrorDBNotCreated );
 			}
 		}
-		PrjtDBCreateHistEntry(gGlobalPrefs.loginName, "Logging In");
-		if(StrCompare(gGlobalPrefs.loginName,"Bradshaw,Carrie")==0){
+		if(IsLoggedIn(NULL)){
+			PrjtDBCreateHistEntry(gGlobalPrefs.loginName, "Logging In");
+		}
+		if(IsLoggedIn("Bradshaw,Carrie")){
 			SetAlert(30,0);
 		}
 	}
@@ -1373,6 +1378,13 @@ static void MainFormHandleNewProjectRequest( void )
 	frmP = FrmGetActiveForm();
 	MainFormInit( frmP );
 	FrmDrawForm ( frmP );
+
+	if(IsLoggedIn(NULL))
+	{
+		gCurrentProject.projIndex = 0;
+		gCurrentProject.currentPage = ToDoPage;
+		FrmGotoForm( InteractionForm );
+	}
 }
 
 /*
@@ -1399,7 +1411,7 @@ static void MainFormInit( FormType * frmP )
 	font = FntSetFont( gGlobalPrefs.mainFont );
 	lineHeight = FntLineHeight();
 	FntSetFont( font );
-
+#if 0
  	tableP = (TableType *)GetObjectPtr( MainProjectTable );
 
 #ifdef CONFIG_HANDERA
@@ -1456,10 +1468,6 @@ static void MainFormInit( FormType * frmP )
 	CategoryGetName( gMainDatabase.db, gMainDatabase.currentCategory, labelP );
 	CategorySetTriggerLabel( controlP, labelP );
 
-	if(gGlobalPrefs.loginName[0] != 0) {
-		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, MainNewButton ) ),gGlobalPrefs.loginName);
-	}
-
 #ifdef CONFIG_HANDERA
 	if( gGlobalPrefs.vgaExtension )
 		MainFormResize( frmP, false );
@@ -1468,7 +1476,7 @@ static void MainFormInit( FormType * frmP )
 	// load the table with data -------------------------------------------------
 	gTopVisibleProjectIndex = 0;
 	MainFormLoadTable();
-
+#endif
 	// set the right menu -------------------------------------------------------
 #ifdef CONFIG_OS_BELOW_35
 	if( !gGlobalPrefs.rom35present )
@@ -1479,6 +1487,12 @@ static void MainFormInit( FormType * frmP )
 	// initialiy the gRowSelected variable
 	gRowSelected = noRowSelected;
 #endif /* CONFIG_JOGDIAL */
+
+	if(IsLoggedIn(NULL)) {
+		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, MainNewButton ) ),gGlobalPrefs.loginName);
+	} else {
+		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, MainNewButton ) ), "Login");
+	}
 
 
 }

@@ -133,6 +133,7 @@ typedef struct
 
 	DateFormatType							dateFormat;
 	Char									loginName[kLoginNameMaxLen];
+	Char									studentName[kLoginNameMaxLen];
 
 #ifdef CONFIG_SONY
 	UInt16									sonyLibRefNum;
@@ -212,6 +213,10 @@ extern Boolean				NoteFormHandleEvent( EventType * eventP ) THIRD_SECTION;
 // event handler for the details dialog -----------------------------------------------------------
 extern Boolean				DetailsFormHandleEvent( EventType * eventP ) SECOND_SECTION;
 
+// event handler for the interaction dialog -----------------------------------------------------------
+extern Boolean				InteractionFormHandleEvent( EventType * eventP ) SECOND_SECTION;
+
+
 #ifdef CONFIG_DEF_CATEGORY
 // event handler for the default categories dialog ------------------------------------------------
 // i dont know why but when we declare some of the default categories function
@@ -231,6 +236,9 @@ extern Boolean        AllToDosHandleEvent( EventType * eventP ) SECOND_SECTION;
 
 // general purpose funtions -----------------------------------------------------------------------
 extern Boolean				ToDoItemIsDue( PrjtToDoType * todoP );
+extern Boolean				IsLoggedIn(Char* name);
+extern void					Login(Char* name, Char* studentName);
+extern void					Logout();
 extern void 					DrawFormAndRoundTitle( FormType * frmP, Char * title ) SECOND_SECTION;
 extern ControlType * 	GetObjectPtr( UInt16 objectID );
 extern Boolean 				SeekProjectRecord( UInt16* indexP, Int16 offset, Int16 direction ) SECOND_SECTION;
