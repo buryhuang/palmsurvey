@@ -1223,6 +1223,7 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 	PrjtPackedProjectType * maindb_recP;
 	Char	*									strP;
 	PrjtToDoType * 					todoP;
+	PrjtToDoHistType *					histP;
 	BitmapType * 						bmpP;
 	MemHandle 							bmpH;
 	MemHandle								todoH;
@@ -1234,6 +1235,7 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 	Boolean									showCategory;
 	Char										horzEllipsis;
 	UInt16									x, y;
+	Boolean						readHist = false;
 #ifdef CONFIG_COLOR
 	IndexedColorType prvTextColor = 0;
 #endif
@@ -1256,7 +1258,7 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		// grab the main db record
 		maindb_recP = GetProjectRecord( titP->index, false );
 		ErrFatalDisplayIf( !maindb_recP, "bad record" );
-
+#if 0
 		if( gDBs[titP->gdb_index].db )
 		{
 			CategoryGetName( gDBs[titP->gdb_index].db, gDBs[titP->gdb_index].db_category, szBuffer );
@@ -1276,7 +1278,7 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		}
 		else
 			cat_width = 0;
-
+#endif
 #ifdef CONFIG_HANDERA
 		if( gGlobalPrefs.vgaExtension && VgaIsVgaFont( gGlobalPrefs.allToDosFont ) )
 		{
@@ -1301,6 +1303,14 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 
 		strP = &maindb_recP->name;
 		len = StrLen( strP );
+
+		//bury
+		if(StrStr(strP,"Hist")!=NULL)
+		{
+			readHist=true;
+			//return;
+		}
+		
 		width = bounds->extent.x - (kDBNameOffset+3+cat_width);
 		FntCharsInWidth( strP, &width, &len, &fitInWidth );
 		if( !fitInWidth && cat_width > bounds->extent.x>>2 )
@@ -1311,7 +1321,7 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 			FntCharsInWidth( strP, &width, &len, &fitInWidth );
 		}
 
-    gDBs[titP->gdb_index].name_width = width;
+		gDBs[titP->gdb_index].name_width = width;
 
 		if( fitInWidth )
 		{
@@ -1391,7 +1401,10 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		ErrFatalDisplayIf( !todoDB, "db not open" );
 		todoH = DmQueryRecord( todoDB, titP->index );
 		ErrFatalDisplayIf( !todoH, "bad record" );
-		todoP = MemHandleLock( todoH );
+		if(!readHist)
+			todoP = MemHandleLock( todoH );
+		else
+			histP = MemHandleLock( todoH );
 		showCategory = (gGlobalPrefs.showToDoCategories && gDBs[titP->gdb_index].db_category == dmAllCategories);
 
 		// first: draw the checkbox (always unchecked)
@@ -1408,23 +1421,27 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		else
 #endif /* CONFIG_HANDERA */
 			FntSetFont( symbol11Font );
-		todoFinished = todoP->priority & kToDosCompleteFlag;
-		if( todoFinished )
-			horzEllipsis = '\x01';
-		else
-			horzEllipsis = '\x00';
+		if(!readHist)
+		{
+			todoFinished = todoP->priority & kToDosCompleteFlag;
+			if( todoFinished )
+				horzEllipsis = '\x01';
+			else
+				horzEllipsis = '\x00';
+		}
 
 #ifdef CONFIG_COLOR
 		if( gGlobalPrefs.useColors && todoFinished )
 			prvTextColor = WinSetTextColor( GRAY_COLOR_INDEX );
 #endif
 
-		WinDrawChars( &horzEllipsis, 1, x, y );
+		//bury
+		//WinDrawChars( &horzEllipsis, 1, x, y );
 		x += width;
 
 		// second: draw the priority of that item
 		// temporarily we use 'horzEllipsis' here
-		if( gGlobalPrefs.showToDoPrio )
+		if( gGlobalPrefs.showToDoPrio && (!readHist) )
 		{
 #ifdef CONFIG_HANDERA
 			if( gGlobalPrefs.vgaExtension && VgaIsVgaFont( gGlobalPrefs.allToDosFont ) )
@@ -1443,9 +1460,9 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 					tmp = boldFont;
 				else if( gGlobalPrefs.allToDosFont == largeFont )
 					tmp = largeBoldFont;
-        else
-          tmp = gGlobalPrefs.allToDosFont;
-        FntSetFont( tmp );
+				else
+					 tmp = gGlobalPrefs.allToDosFont;
+				FntSetFont( tmp );
 			}
 			horzEllipsis = '0';
 			horzEllipsis += (todoP->priority & kToDosPriorityMask);
@@ -1454,8 +1471,9 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		}
 
 		// third: draw the record's due date if necessary
-		itemIsDue = ToDoItemIsDue( todoP );
-		if( gGlobalPrefs.showToDoDueDate )
+		if(!readHist)
+			itemIsDue = ToDoItemIsDue( todoP );
+		if( gGlobalPrefs.showToDoDueDate && (!readHist))
 		{
 			// push temporarily the x value on the stack
 			// as we need the current x value for later use
@@ -1525,35 +1543,57 @@ void AllToDosDrawTableItem( void * tblP, Int16 row, Int16 col, RectangleType * b
 		}
 
 		// fourth: draw the record's description
-		strP = &todoP->description;
-		FntSetFont( gGlobalPrefs.allToDosFont );
-		len = StrLen( strP );
-		width = bounds->extent.x - x;
-		if( gGlobalPrefs.showToDoDueDate )
-			width -= (kToDoDueDateWidth+1);
-		if( showCategory )
-			width -= (kToDoCategoryWidth+1);
+		if(!readHist)
+		{
+			strP = &todoP->description;
+			FntSetFont( gGlobalPrefs.allToDosFont );
+			len = StrLen( strP );
+			width = bounds->extent.x - x;
+			if( gGlobalPrefs.showToDoDueDate )
+				width -= (kToDoDueDateWidth+1);
+			if( showCategory )
+				width -= (kToDoCategoryWidth+1);
 
-		FntCharsInWidth( strP, &width, &len, &fitInWidth );
+			FntCharsInWidth( strP, &width, &len, &fitInWidth );
 #ifdef CONFIG_COLOR
-		if( gGlobalPrefs.useColors && itemIsDue )
-			prvTextColor = WinSetTextColor( RED_COLOR_INDEX );
+			if( gGlobalPrefs.useColors && itemIsDue )
+				prvTextColor = WinSetTextColor( RED_COLOR_INDEX );
 #endif
-		if( fitInWidth )
-			WinDrawChars( strP, len, x, y );
+			if( fitInWidth )
+				WinDrawChars( strP, len, x, y );
+			else
+			{
+				ChrHorizEllipsis( &horzEllipsis );
+				width -= FntCharWidth( horzEllipsis );
+				FntCharsInWidth( strP, &width, &len, &fitInWidth );
+				WinDrawChars( strP, len, x, bounds->topLeft.y );
+				WinDrawChars( &horzEllipsis, 1, x + width, bounds->topLeft.y );
+			}
+#ifdef CONFIG_COLOR
+			if( gGlobalPrefs.useColors && (itemIsDue || todoFinished) )
+				WinSetTextColor( prvTextColor );
+#endif
+		}
 		else
 		{
-			ChrHorizEllipsis( &horzEllipsis );
-			width -= FntCharWidth( horzEllipsis );
-			FntCharsInWidth( strP, &width, &len, &fitInWidth );
-			WinDrawChars( strP, len, x, bounds->topLeft.y );
-			WinDrawChars( &horzEllipsis, 1, x + width, bounds->topLeft.y );
-		}
-#ifdef CONFIG_COLOR
-		if( gGlobalPrefs.useColors && (itemIsDue || todoFinished) )
-			WinSetTextColor( prvTextColor );
-#endif
+			strP = &histP->user;
+			FntSetFont( gGlobalPrefs.allToDosFont );
+			len = StrLen( strP );
+			width = bounds->extent.x - x;
 
+			FntCharsInWidth( strP, &width, &len, &fitInWidth );
+
+			if( fitInWidth )
+				WinDrawChars( strP, len, x, y );
+			else
+			{
+				ChrHorizEllipsis( &horzEllipsis );
+				width -= FntCharWidth( horzEllipsis );
+				FntCharsInWidth( strP, &width, &len, &fitInWidth );
+				WinDrawChars( strP, len, x, bounds->topLeft.y );
+				WinDrawChars( &horzEllipsis, 1, x + width, bounds->topLeft.y );
+			}
+		}
 		MemHandleUnlock( todoH );
 	}
 
@@ -1868,15 +1908,18 @@ Boolean AllToDosHandleEvent( EventType * eventP )
 			if( gTableItems[eventP->data.tblEnter.row].item_type == kProjectToDoItemType )
 			{
 				if( eventP->screenX <= (kToDoCompletionOffset+kToDoCompletionWidth) )
-					AllToDosToggleToDoCompleted( eventP->data.tblEnter.row );
+					//bury
+					;//AllToDosToggleToDoCompleted( eventP->data.tblEnter.row );
 				else
 				{
-					AllToDosGotoToDoItem( &gTableItems[eventP->data.tblEnter.row] );
+					//bury
+					;//AllToDosGotoToDoItem( &gTableItems[eventP->data.tblEnter.row] );
 				}
 			}
 			else
 			{
-				AllToDosHandleTapIntoDBNameRow( eventP->data.tblEnter.pTable, eventP->data.tblEnter.row, eventP->screenX, eventP->screenY ); 
+				//bury
+				;//AllToDosHandleTapIntoDBNameRow( eventP->data.tblEnter.pTable, eventP->data.tblEnter.row, eventP->screenX, eventP->screenY ); 
 			}
 			handled = true;
 			break;

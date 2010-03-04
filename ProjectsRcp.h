@@ -355,6 +355,12 @@
 
 #define ActionLoggingAlert							1049
 
+#define GlobalPreferenceDialog						1050
+#define OptionsGlobalPreference						1051
+
+#define PreferencesAlarmIntervalPopTrigger			1052
+#define PreferencesAlarmIntervalList					1053
+
 
 
 // bitmaps ----------------------------------------------------------------------------------------
