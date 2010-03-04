@@ -783,6 +783,12 @@ Boolean InteractionFormHandleEvent( EventType * eventP )
 	Boolean handled = false;
 	FormType * frmP;
 
+	FormType 		*	newP;
+	ListType *			listP;
+	ListType *			listP2;
+	Int16				curSel;
+	Int16				curSel2;
+	
 	switch( eventP->eType )
 	{
 #ifdef CONFIG_JOGDIAL
@@ -815,10 +821,19 @@ Boolean InteractionFormHandleEvent( EventType * eventP )
 			switch( eventP->data.ctlSelect.controlID )
 			{
 				case InteractionNextButton:
+					newP = FrmGetActiveForm();
+					listP = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, InteractionList ) );
+					listP2 = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, ImportanceList ) );
+	
+					curSel = LstGetSelection( listP );
+					curSel2 = LstGetSelection( listP2 );
+					SetContactType(LstGetSelectionText( listP, curSel),LstGetSelectionText( listP2, curSel2));
+					
 					FrmEraseForm(FrmGetActiveForm());
 					FrmGotoForm(ProjectForm);
 					// as long as we dont provide update code we just pass 0 as the second param
 					FrmUpdateForm( ProjectForm, 0 );
+
 					handled = true;
 					break;
 
@@ -1683,6 +1698,7 @@ static void ProjectFormToDoRestoreEditState( void )
 	// call FrmSetFocus does not releases the focus from the table
 	// on a HandEra330
 	TblReleaseFocus( tableP );
+	#if 0
 	FrmSetFocus( frmP, tableIndex );
 	TblGrabFocus( tableP, row, kProjectFormDescriptionTableColumn );
 	fieldP = TblGetCurrentField( tableP );
@@ -1690,6 +1706,7 @@ static void ProjectFormToDoRestoreEditState( void )
 	if( gCurrentToDoEditSelectionLength )
 		FldSetSelection( fieldP, gCurrentToDoEditPosition, (gCurrentToDoEditPosition + gCurrentToDoEditSelectionLength) );
 	FldGrabFocus( fieldP );
+	#endif
 }
 
 static void	ProjectFormInitToDoTableRow( TableType *tableP, Int16 row, UInt16 recIndex, Int16 rowHeight )
@@ -1734,6 +1751,7 @@ static void	ProjectFormInitToDoTableRow( TableType *tableP, Int16 row, UInt16 re
 	// set the table item type for the description
 	noteP = (&recP->description + StrLen( &recP->description ) + 1);
 	ErrFatalDisplayIf( !noteP, "no note ptr found" );
+
 	if( *noteP )
 		TblSetItemStyle( tableP, row, kProjectFormDescriptionTableColumn, textWithNoteTableItem );
 	else
@@ -2052,7 +2070,7 @@ static void ProjectFormDeleteToDo( void )
 
 	ErrFatalDisplayIf( !gCurrentProject.todoDB, "database is not open" );
 
-	if(!IsLoggedIn("Hofstadter,Leonard"))
+	if(!IsLoggedIn("Zemke, Kim"))
 		return (false);
 
 	if( !gToDoItemSelected )
@@ -2470,7 +2488,11 @@ void ProjectFormToggleToDoCompleted( EventType * eventP )
 	recIndex	= TblGetRowID( tableP, row );
 	if(FrmAlert(ActionLoggingAlert)==0) {
 		if(IsLoggedIn(NULL)) {
-			StrPrintF(buff,"toggled %d,%d",row,recIndex);
+			StrPrintF(buff,",%s,%s,%s,%d,%d",
+				gGlobalPrefs.studentName,
+				gGlobalPrefs.contactType,
+				gGlobalPrefs.importance,
+				row,recIndex);
 			PrjtDBCreateHistEntry(gGlobalPrefs.loginName, buff);
 		}
 	}
@@ -4065,7 +4087,9 @@ static void	ProjectFormSwitchToToDoPage( FormType * frmP, Boolean drawtable )
 			FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectMoveToDoDownButton ) );
 		}
 
-		FrmSetMenu( frmP, ProjectFormToDoMenu );
+		if(IsLoggedIn("Zemke, Kim")) {
+			FrmSetMenu( frmP, ProjectFormToDoMenu );
+		}
 		FrmSetFocus( frmP, tableIndex );
 
 		if( !gToDoPageInitialized )
@@ -4094,7 +4118,7 @@ static void	ProjectFormSwitchToToDoPage( FormType * frmP, Boolean drawtable )
 		FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectCreateDBButton ) );
 	}
 
-	if(!IsLoggedIn("Hofstadter,Leonard")) {
+	if(!IsLoggedIn("Zemke, Kim")) {
 		FrmHideObject( frmP, FrmGetObjectIndex( frmP, ProjectNewToDoButton));
 	} else {
 		FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectNewToDoButton));
@@ -4102,6 +4126,7 @@ static void	ProjectFormSwitchToToDoPage( FormType * frmP, Boolean drawtable )
 
 	if(IsLoggedIn(NULL)) {
 		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, ProjectLoginLabel ) ),gGlobalPrefs.loginName);
+		CtlSetLabel(FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, ProjectStudentLabel ) ),gGlobalPrefs.studentName);
 	}
 
 	FrmShowObject( frmP, FrmGetObjectIndex( frmP, ProjectChngIntActionButton ) );
@@ -5319,6 +5344,10 @@ Boolean ProjectFormHandleEvent( EventType * eventP )
 				case kProjectFormDescriptionTableColumn:
 					frmP = FrmGetActiveForm();
 					tableP = FrmGetObjectPtr( frmP, FrmGetObjectIndex( frmP, ProjectToDoTable ) );
+					if(!IsLoggedIn("Zemke, Kim")) {
+						TblReleaseFocus( tableP );
+						break;
+					}
 					gCurrentProject.curToDoIndex = TblGetRowID( tableP, eventP->data.tblSelect.row );
 					if( TblEditing( tableP ) )
 						gToDoItemSelected = true;

@@ -33,6 +33,11 @@ typedef struct
 	FontID todoPageFont;
 	FontID noteFormFont;
 	FontID allToDosFont;
+	Char   loginName[kLoginNameMaxLen];
+	Char   studentName[kLoginNameMaxLen];	
+	Char   contactType[kLoginNameMaxLen];
+	Char   importance[kLoginNameMaxLen];
+	UInt16 alarmInterval;
 } 
 ProjectsPreferencesType;
 
@@ -70,23 +75,47 @@ Boolean IsLoggedIn(Char * name)
 {
 	if(name == NULL)
 	{
-		return (!(gGlobalPrefs.loginName[0] == 0));
+		return (
+			!(gGlobalPrefs.loginName[0] == 0)
+			||!(gGlobalPrefs.studentName[0] == 0));
 	}
-	return (!strncmp(gGlobalPrefs.loginName,name,kLoginNameMaxLen-1));
+	return (
+		!strncmp(gGlobalPrefs.loginName,name,kLoginNameMaxLen-1)
+		||!strncmp(gGlobalPrefs.studentName,name,kLoginNameMaxLen-1));
 }
+
+
+extern Err  SetAlert(UInt32 delay, UInt32 refParam);
+extern Err  CancelAlert();
 
 void Logout()
 {
 	if(IsLoggedIn(NULL)) {
 		gGlobalPrefs.loginName[0] = 0;
+		gGlobalPrefs.studentName[0] = 0;
+	}
+	CancelAlert();
+}
+
+void SetContactType(Char * type, Char * importance)
+{
+	if(type != NULL) {
+		StrNCopy(gGlobalPrefs.contactType,type ,kLoginNameMaxLen);
+		gGlobalPrefs.contactType[kLoginNameMaxLen-1]=0;
+	}
+
+	if(importance != NULL) {
+		StrNCopy(gGlobalPrefs.importance,importance ,kLoginNameMaxLen);
+		gGlobalPrefs.importance[kLoginNameMaxLen-1]=0;
 	}
 }
 
 void Login(Char * name, Char * studentName)
 {
-	StrNCopy(gGlobalPrefs.loginName,name ,kLoginNameMaxLen);
-	gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
-	//StrNCopy(gGlobalPrefs.loginName,"Hofstadter,Leonard",kLoginNameMaxLen);
+	if(name != NULL) {
+		StrNCopy(gGlobalPrefs.loginName,name ,kLoginNameMaxLen);
+		gGlobalPrefs.loginName[kLoginNameMaxLen-1]=0;
+	}
 
 	if(studentName != NULL) {
 		StrNCopy(gGlobalPrefs.studentName,studentName ,kLoginNameMaxLen);
@@ -725,12 +754,14 @@ static Err  AppStart( UInt16 * formID )
 		gGlobalPrefs.showPrjtCategories = 0;
 		gGlobalPrefs.showOnlyActive = 0;
 
-		gGlobalPrefs.showToDoPrio = 1;
-		gGlobalPrefs.showToDoDueDate = 1;
+		gGlobalPrefs.showToDoPrio = 0;
+		gGlobalPrefs.showToDoDueDate = 0;
 		gGlobalPrefs.showToDoCategories = 0;
 		gGlobalPrefs.showCompleteToDos = 1;
 		gGlobalPrefs.showOnlyDueDateToDos = 0;
 		gGlobalPrefs.completeToDoDueDate = 0;
+
+		gGlobalPrefs.alarmInterval = kAlarmIntervalInSec;
 
 		FtrGet(sysFtrCreator, sysFtrDefaultFont, &tmp_ui32);
 #ifdef CONFIG_HANDERA
@@ -762,6 +793,10 @@ static Err  AppStart( UInt16 * formID )
 		gGlobalPrefs.showOnlyDueDateToDos	= (prefs.flags & kShowOnlyDueDateToDosFlag) ? 1 : 0;
 		gGlobalPrefs.completeToDoDueDate	= (prefs.flags & kCompleteToDoDueDateFlag) ? 1 : 0;
 
+		gGlobalPrefs.showToDoPrio = 0;
+		gGlobalPrefs.showToDoDueDate = 0;
+		gGlobalPrefs.showToDoCategories =	0;
+
 		// if the last form was project form go there to the lastly visited
 		// category class, else set the default category to "All"
 		// so next time the user chooses a project he sees all entries
@@ -775,8 +810,12 @@ static Err  AppStart( UInt16 * formID )
 		gGlobalPrefs.noteFont = prefs.noteFormFont;
 		gGlobalPrefs.allToDosFont = prefs.allToDosFont;
 
-//		Logout();
-
+		StrNCopy(gGlobalPrefs.loginName, prefs.loginName, kLoginNameMaxLen);
+		StrNCopy(gGlobalPrefs.studentName, prefs.studentName, kLoginNameMaxLen);
+		StrNCopy(gGlobalPrefs.contactType, prefs.contactType, kLoginNameMaxLen);
+		StrNCopy(gGlobalPrefs.importance, prefs.importance, kLoginNameMaxLen);
+		gGlobalPrefs.alarmInterval = prefs.alarmInterval;
+	
 		if( prefs.flags & kGeneralPageFlag )
 			gCurrentProject.currentPage = GeneralPage;
 		else if( prefs.flags & kToDoPageFlag )
@@ -877,6 +916,12 @@ static void AppStop( void )
 	prefs.memoPageFont = gGlobalPrefs.memoFont;
 	prefs.noteFormFont = gGlobalPrefs.noteFont;
 	prefs.allToDosFont = gGlobalPrefs.allToDosFont;
+
+	StrNCopy(prefs.loginName, gGlobalPrefs.loginName, kLoginNameMaxLen);
+	StrNCopy(prefs.studentName, gGlobalPrefs.studentName, kLoginNameMaxLen);
+	StrNCopy(prefs.contactType, gGlobalPrefs.contactType, kLoginNameMaxLen);
+	StrNCopy(prefs.importance, gGlobalPrefs.importance, kLoginNameMaxLen);
+	prefs.alarmInterval = gGlobalPrefs.alarmInterval;
 
 	// make sure all data is being saved
 	FrmCloseAllForms();
@@ -1234,6 +1279,9 @@ static void	ProjectsHandleSyncNotify( void )
 	DmCloseDatabase( mainDB );
 }
 
+extern Err  SetAlert(UInt32 delay, UInt32 refParam);
+extern Err  CancelAlert();
+
 /*
  * FUNCTION:				PilotMain
  * 									this is our app's entry point
@@ -1253,7 +1301,6 @@ UInt32 PilotMain( UInt16 cmd, void * cmdPBP, UInt16 launchFlags )
 	switch( cmd )
 	{
 		case sysAppLaunchCmdNormalLaunch:
-		//case sysAppLaunchCmdDisplayAlarm:
 			//HostTraceInit();
 			error = AppStart( &formID );
 			if (error) 
@@ -1272,8 +1319,12 @@ UInt32 PilotMain( UInt16 cmd, void * cmdPBP, UInt16 launchFlags )
 			break;
 
 		case sysAppLaunchCmdAlarmTriggered:
-			((SysAlarmTriggeredParamType *)cmdPBP)->purgeAlarm = true; // suppresses sysAppLaunchCmdDisplayAlarm
+			((SysAlarmTriggeredParamType *)cmdPBP)->purgeAlarm = false; // suppresses sysAppLaunchCmdDisplayAlarm
+			break;
+			
+		case sysAppLaunchCmdDisplayAlarm:
 			SndPlaySystemSound(sndAlarm);
+			SetAlert(SysRandom(0)%gGlobalPrefs.alarmInterval,0); // 20 mins = 20*60 seconds
 			break;
 			
 		case sysAppLaunchCmdGoTo:

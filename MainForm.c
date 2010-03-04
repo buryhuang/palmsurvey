@@ -543,6 +543,71 @@ static void	MainFormNextCategory( void )
 	}
 }
 
+
+static void MainFormSelectGlobalPref( void )
+{
+	FormType * 	prefP = FrmInitForm( GlobalPreferenceDialog );
+	ControlType * popP = FrmGetObjectPtr( prefP, FrmGetObjectIndex( prefP, PreferencesAlarmIntervalPopTrigger ) );
+	ListType *	listP = FrmGetObjectPtr( prefP, FrmGetObjectIndex( prefP, PreferencesAlarmIntervalList ) );
+	Char *		labelP;
+	UInt8		intervalIndex = 0;
+
+	labelP = (Char *)CtlGetLabel( popP );
+	switch(gGlobalPrefs.alarmInterval)
+	{
+		case 20*60:
+			StrCopy( labelP, "20 mins" );
+			intervalIndex = 0;
+			break;
+		case 10*60:
+			StrCopy( labelP,"10 mins");
+			intervalIndex = 1;
+			break;
+		case 30*60:
+			StrCopy( labelP, "30 mins" );
+			intervalIndex = 2;
+			break;
+		case 30:
+			StrCopy( labelP, "30 secs");
+			intervalIndex = 3;
+			break;
+		default:
+			StrCopy( labelP, "Error");
+			break;
+	}
+	
+	CtlSetLabel( popP, labelP );
+	LstSetSelection( listP, intervalIndex );
+
+	if( FrmDoDialog( prefP ) != PreferencesOKButton )
+	{
+		FrmDeleteForm( prefP );
+		return;
+	}
+
+	switch (LstGetSelection( listP ))
+	{
+		case 0:
+			gGlobalPrefs.alarmInterval = 20*60;
+			break;
+		case 1:
+			gGlobalPrefs.alarmInterval = 10*60;
+			break;
+		case 2:
+			gGlobalPrefs.alarmInterval = 30*60;
+			break;
+		case 3:
+			gGlobalPrefs.alarmInterval = 30;
+			break;
+		default:
+			gGlobalPrefs.alarmInterval = 20*60;
+			break;
+	}
+
+	FrmDeleteForm( prefP );
+
+}
+
 /*
  * FUNCTION:			MainFormHandlePreferencesSelection
  * DESCRIPTION:		this routine pops up the preference
@@ -976,6 +1041,7 @@ static void	MainFormSelectCategory( void )
  * PARAMETERS:		see palm sdk
  * RETURNS:				nothing
  */
+ #if 0
 static void	MainFormDrawProject( void *tableP, Int16 row, Int16 column, RectangleType * bounds )
 {
 	Char 				szBuffer[32];
@@ -1148,7 +1214,7 @@ static void	MainFormDrawProject( void *tableP, Int16 row, Int16 column, Rectangl
 #endif
 	}
 }
-		
+#endif		
 /*
  * FUNCTION:			MainFormLoadTable
  * DESCRIPTION:		loads our table on the main form with data
@@ -1249,7 +1315,22 @@ static void MainFormLoadTable( void )
 	FrmUpdateScrollers( frmP, upIndex, downIndex, upEnable, downEnable );
 }
 
-static Err  SetAlert(UInt32 delay, UInt32 refParam) {
+Err  CancelAlert() {
+    Err error = errNone;
+    UInt16 cardNo;
+    LocalID dbID;
+    DmSearchStateType searchInfo;
+
+    /* find out what is the local program ID for the current program */
+    error = DmGetNextDatabaseByTypeCreator(true, &searchInfo, sysFileTApplication, appFileCreator, false, &cardNo, &dbID);
+    if (error!=errNone) return(error);
+
+    /* set the alert */
+    error = AlmSetAlarm(cardNo, dbID, 0, 0, true);
+    return(error);
+}
+
+Err  SetAlert(UInt32 delay, UInt32 refParam) {
     Err error = errNone;
     UInt32 alarmTime;
     UInt16 cardNo;
@@ -1285,24 +1366,24 @@ static Err  SetAlert(UInt32 delay, UInt32 refParam) {
 static void MainFormHandleNewProjectRequest( void )
 {
 	PrjtUnpackedProjectType	project;
-	FieldType 	* fieldP;
+	//FieldType 	* fieldP;
 	FormType 		*	frmP; 
 	FormType 		*	newP;
-	TableType * 			tableP;
+	//TableType * 			tableP;
 	UInt16				fieldIndex;
 	DmOpenRef			db = 0;
 	UInt16				index = kNoRecordIndex;
-	ControlType * 		popP;
+	//ControlType * 		popP;
 	ListType *			listP;
 	ListType *			listP2;
 	Int16				curSel;
 	Int16				curSel2;
-	Char *				labelP;
+	//Char *				labelP;
 
 	// get the name for the new database ----------------------------------------
 	frmP = FrmGetActiveForm();
 	newP = FrmInitForm( ProjectNameForm );
-	//fieldIndex = FrmGetObjectIndex( newP, ProjectNameFormNameField );
+	fieldIndex = FrmGetObjectIndex( newP, ProjectNameFormNameField );
 	//FrmSetEventHandler( newP, ProjectNameFormHandleEvent );
 
 	//popP = FrmGetObjectPtr( newP, FrmGetObjectIndex( newP, LoginNamePopTrigger ) );
@@ -1356,12 +1437,7 @@ static void MainFormHandleNewProjectRequest( void )
 					ShowGeneralAlert( ErrorDBNotCreated );
 			}
 		}
-		if(IsLoggedIn(NULL)){
-			PrjtDBCreateHistEntry(gGlobalPrefs.loginName, "Logging In");
-		}
-		if(IsLoggedIn("Bradshaw,Carrie")){
-			SetAlert(30,0);
-		}
+		SetAlert(SysRandom(0)%gGlobalPrefs.alarmInterval,0); // 20 mins = 20*60 seconds
 	}
 
 	if( frmP )
@@ -1398,13 +1474,15 @@ static void MainFormHandleNewProjectRequest( void )
  */
 static void MainFormInit( FormType * frmP )
 {
+#if 0
 	TableType * 	tableP;
 	ControlType *	controlP;
 	Char *				labelP;
 	UInt16			i, j;
 	UInt16			numRows;
-	UInt16			lineHeight;
+#endif
 	FontID			font;
+	UInt16			lineHeight;
 
 	ErrFatalDisplayIf( !frmP, "invalid param" );
 
@@ -1838,6 +1916,11 @@ Boolean MainFormHandleEvent( EventType * eventP )
 			{
 				MainFormSelectSecurity();
 				handled = true;
+			}
+			else if( eventP->data.menu.itemID == OptionsGlobalPreference )
+			{
+				MainFormSelectGlobalPref();
+				handled=true;
 			}
 			else if( eventP->data.menu.itemID == OptionsFont )
 			{

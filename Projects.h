@@ -109,7 +109,8 @@
 #define kState5Char								'?'
 #define kState5CharFont						boldFont
 
-#define kLoginNameMaxLen						32
+#define kLoginNameMaxLen						16
+#define kAlarmIntervalInSec						20*60 //default 20 minutes
 
 // structures -------------------------------------------------------------------------------------
 
@@ -134,6 +135,9 @@ typedef struct
 	DateFormatType							dateFormat;
 	Char									loginName[kLoginNameMaxLen];
 	Char									studentName[kLoginNameMaxLen];
+	Char									contactType[kLoginNameMaxLen];
+	Char									importance[kLoginNameMaxLen];
+	UInt16									alarmInterval;
 
 #ifdef CONFIG_SONY
 	UInt16									sonyLibRefNum;
@@ -237,6 +241,7 @@ extern Boolean        AllToDosHandleEvent( EventType * eventP ) SECOND_SECTION;
 // general purpose funtions -----------------------------------------------------------------------
 extern Boolean				ToDoItemIsDue( PrjtToDoType * todoP );
 extern Boolean				IsLoggedIn(Char* name);
+extern void					SetContactType(Char* type, Char* importance);
 extern void					Login(Char* name, Char* studentName);
 extern void					Logout();
 extern void 					DrawFormAndRoundTitle( FormType * frmP, Char * title ) SECOND_SECTION;

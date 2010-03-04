@@ -1,0 +1,6 @@
+Version 0.08
+2) Student name cannot be input on the fly yet. We still need to change the code to add or modifiy student/provider names.
+3) The 20 mins counting start right after logging in
+4) The beep doesn¡¯t beep forever, will be able to do so and will be configurable.
+5) The only way to modify question list is using ¡°trick¡±.
+6) History is not able to show on screen yet. The record can only be view at PC.
